@@ -1,10 +1,10 @@
+"""作用：提供demoProject sessions相关的基础封装。"""
+
 #
 # demoProject_sessions.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2022-07-25T19:32:07.806Z+08:00
 # @last-modified 2022-07-25T19:58:23.123Z+08:00
-# github https://github.com/yanchunhuo
 
 
 from common.sqlalchemy_tools.sqlalchemy_sqlite_tool import SQLAlchemy_Sqlite_Tool
@@ -19,7 +19,7 @@ class DemoProject_Sessions(object):
         return cls.__instance
 
     def __init__(self,):
-        if self.__inited is None:            
+        if self.__inited is None:
             self.db_demoProject_session=SQLAlchemy_Sqlite_Tool('models/demoProject/demoProject.db').get_session()
-                        
+
         self.__inited = True

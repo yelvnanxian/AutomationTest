@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：提供dateTimeTool相关的通用工具能力。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 import calendar
 import datetime
 import time
@@ -22,7 +22,7 @@ class DateTimeTool:
     @classmethod
     def getNowTimeStampWithMillisecond(cls):
         return int(round(time.time()*1000))
-    
+
     @classmethod
     def timeStampToDateTime(cls,timeStamp:int,is_with_millisecond=False):
         if is_with_millisecond:
@@ -66,7 +66,7 @@ class DateTimeTool:
     def getHowYearsAgo(cls,nowDate,howYearsAgo=0,nowDate_format='%Y-%m-%d'):
         resultDate = cls.getHowDaysAgo(nowDate,nowDate_format,howYearsAgo*366)
         return resultDate
-    
+
     @classmethod
     def getCurrentMonthFirstDayOrLastDay(cls,type=1):
         """获取当前月第一天或者最后一天日期
@@ -84,6 +84,6 @@ class DateTimeTool:
         if type==1:
             start = datetime.date(year,month,1)
             return start
-        if type==-1: 
+        if type==-1:
             end = datetime.date(year,month,last_day)
             return end

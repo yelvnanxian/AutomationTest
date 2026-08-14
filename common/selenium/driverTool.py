@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：提供driverTool相关的通用工具能力。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from base.read_web_ui_config import Read_WEB_UI_Config
 from selenium import webdriver
 from selenium.webdriver.ie import webdriver as ie_webdriver

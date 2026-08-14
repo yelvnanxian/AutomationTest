@@ -1,6 +1,6 @@
-# @Author  : yanchunhuo
+"""作用：读取并解析report config所需的配置。"""
+
 # @Time    : 2020/7/23 17:14
- # github https://github.com/yanchunhuo
 from pojo.report_config import Report_Config
 import configparser as ConfigParser
 

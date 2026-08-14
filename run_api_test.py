@@ -1,8 +1,8 @@
+"""作用：提供api test流程的命令行执行入口。"""
+
 #
 # run_api_test.py
-# @author yanchunhuo
-# @description 
-# @github https://github.com/yanchunhuo
+# @description
 # @created 2021-04-13T10:59:18.120Z+08:00
 # @last-modified 2023-05-12T11:04:28.256Z+08:00
 #
@@ -14,6 +14,7 @@ from init.java.java_maven_init import java_maven_init
 import argparse
 import os
 import pytest
+import sys
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser()
@@ -25,7 +26,7 @@ if __name__=='__main__':
     parser.add_argument('-m','--markexpr',help='只运行符合给定的mark表达式的测试',type=str)
     parser.add_argument('-s', '--capture', help='是否在标准输出流中输出日志,1:是、0:否,默认为0',type=str)
     parser.add_argument('-r', '--reruns', help='失败重跑次数,默认为0',type=str)
-    
+
     args=parser.parse_args()
 
     # 处理pytest文件
@@ -78,8 +79,9 @@ if __name__=='__main__':
         if int(args.reruns):
             pytest_execute_params.append('--reruns')
             pytest_execute_params.append(args.reruns)
-    
+
     pytest_execute_params.append(dir)
 
     print('%s开始测试......'%DateTimeTool.getNowTime())
     exit_code=pytest.main(pytest_execute_params)
+    sys.exit(exit_code)

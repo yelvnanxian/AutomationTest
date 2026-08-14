@@ -1,10 +1,10 @@
+"""作用：提供sqlacodegen mysql tool相关的通用工具能力。"""
+
 #
 # sqlacodegen_too.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2022-07-21T17:00:26.678Z+08:00
 # @last-modified 2022-07-25T19:57:33.428Z+08:00
-# github https://github.com/yanchunhuo
 import platform
 import subprocess
 
@@ -21,7 +21,7 @@ class Sqlacodegen_Mysql_Tool:
             driver_type (str, optional): pymysql：pymysql，mysqldb：mysqlclient. Defaults to 'pymysql'.
         """
         self.url='mysql+%s://%s:%s@%s:%s/%s'%(driver_type,username,password,host,str(port),db)
-        
+
     def generate_table_model(self,table_name:str,output_file_path:str):
         command='sqlacodegen %s --tables %s --outfile %s'%(self.url,table_name,output_file_path)
         output = subprocess.check_output(command, shell=True, timeout=3600)
@@ -30,7 +30,7 @@ class Sqlacodegen_Mysql_Tool:
         else:
             output=output.decode('utf-8')
         return output
-        
+
     def generate_db_models(self,output_file_path:str):
         command='sqlacodegen %s --outfile %s'%(self.url,output_file_path)
         output = subprocess.check_output(command, shell=True, timeout=3600)

@@ -1,10 +1,10 @@
+"""作用：定义user相关的持久化模型。"""
+
 #
 # user.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2022-07-25T19:51:16.167Z+08:00
 # @last-modified 2022-07-25T19:56:52.705Z+08:00
-# github https://github.com/yanchunhuo
 
 
 from sqlalchemy import Column, Integer, Text

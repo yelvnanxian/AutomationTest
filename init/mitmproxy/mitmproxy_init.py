@@ -1,6 +1,6 @@
-# @Author  : yanchunhuo
+"""作用：执行mitmproxy init相关的运行前初始化。"""
+
 # @Time    : 2020/7/15 17:43
-# github https://github.com/yanchunhuo
 from base.read_mitmproxy_config import Read_Mitmproxy_Config
 from common.dateTimeTool import DateTimeTool
 from common.strTool import StrTool

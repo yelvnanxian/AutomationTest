@@ -1,7 +1,7 @@
 # -*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：定义demoProject index相关的自动化测试用例。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from base.web_ui.demoProject.web_ui_demoProject_client import WEB_UI_DemoProject_Client
 from page_objects.web_ui.demoProject.pages.indexPage import IndexPage
 from common.hamcrest.hamcrest import assert_that

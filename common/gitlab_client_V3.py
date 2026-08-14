@@ -1,9 +1,9 @@
+"""作用：提供gitlab client V3相关的通用工具能力。"""
+
 # gitlab_client_V3.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2021-04-13T10:59:58.738Z+08:00
 # @last-modified 2023-05-12T11:10:42.216Z+08:00
-# github https://github.com/yanchunhuo
 from common.httpclient.doRequest import DoRequest
 from urllib.parse import urljoin
 import ujson
@@ -20,10 +20,12 @@ class GitlabClientV3:
         self.url=urljoin(self.url,'/api/v3')
         self.doRequest=DoRequest(self.url)
         self.private_token=self._get_private_token()
-        self._path_private_token='?private_token=%s'%self.private_token
+        self.doRequest.updateHeaders({'PRIVATE-TOKEN': self.private_token})
 
     def _login(self):
-        httpResponseResult=self.doRequest.post_with_form('/session?login=%s&password=%s'%(self.username,self.password))
+        httpResponseResult=self.doRequest.post_with_form(
+            '/session', params={'login': self.username, 'password': self.password}
+        )
         return httpResponseResult
 
     def _get_private_token(self):
@@ -35,8 +37,8 @@ class GitlabClientV3:
         return ujson.loads(self._login().body)
 
     def get_projects(self,page:int=1,per_page:int=100):
-        params={'page':1,'per_page':100}
-        httpResponseResult=self.doRequest.get('/projects%s'%self._path_private_token,params=params)
+        params={'page':page,'per_page':per_page}
+        httpResponseResult=self.doRequest.get('/projects',params=params)
         return ujson.loads(httpResponseResult.body)
 
     def _get_project_id(self,project_name:str):
@@ -47,7 +49,7 @@ class GitlabClientV3:
 
     def get_project_tree(self,project_name:str):
         project_id=self._get_project_id(project_name)
-        httpResponsResult=self.doRequest.get('/projects/%s/repository/tree%s'%(project_id,self._path_private_token))
+        httpResponsResult=self.doRequest.get('/projects/%s/repository/tree'%project_id)
         return ujson.loads(httpResponsResult.body)
 
     def get_project_file(self,project_name,ref,file_path):
@@ -59,7 +61,7 @@ class GitlabClientV3:
         """
         project_id=self._get_project_id(project_name)
         params={'file_path':file_path,'ref':ref}
-        httpResponsResult=self.doRequest.get('/projects/%s/repository/files%s'%(project_id,self._path_private_token),params=params)
+        httpResponsResult=self.doRequest.get('/projects/%s/repository/files'%project_id,params=params)
         return ujson.loads(httpResponsResult.body)
 
     def update_project_file(self,project_name:str,branch_name:str,file_path:str,content:str,commit_message:str):
@@ -73,6 +75,5 @@ class GitlabClientV3:
         """
         project_id=self._get_project_id(project_name)
         params={'file_path':file_path,'branch_name':branch_name,'content':content,'commit_message':commit_message}
-        httpResponsResult=self.doRequest.put('/projects/%s/repository/files%s'%(project_id,self._path_private_token),params=params)
+        httpResponsResult=self.doRequest.put('/projects/%s/repository/files'%project_id,params=params)
         return ujson.loads(httpResponsResult.body)
-

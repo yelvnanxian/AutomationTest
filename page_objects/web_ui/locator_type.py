@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
-# 作者 yanchunhuo
+"""作用：提供locator type模块相关功能。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 class Locator_Type:
     ID = "id"
     XPATH = "xpath"

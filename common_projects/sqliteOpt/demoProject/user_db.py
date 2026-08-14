@@ -1,10 +1,10 @@
+"""作用：封装user db相关的项目公共业务能力。"""
+
 #
 # user.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2022-07-25T19:40:40.521Z+08:00
 # @last-modified 2022-08-08T11:56:08.860Z+08:00
-# github https://github.com/yanchunhuo
 
 from base.sqliteOpt.demoProject.demoProject_sessions import DemoProject_Sessions
 from common_projects.sqliteOpt.base_db import Base_DB

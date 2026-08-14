@@ -1,7 +1,7 @@
 #!-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：提供numberTool相关的通用工具能力。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 import re
 
 class NumberTool:
@@ -14,7 +14,7 @@ class NumberTool:
         :return:
         """
         mobile=str(mobile)
-        regular=re.compile('^1[3578]\d{9}$|^14[56789]\d{8}$')
+        regular=re.compile(r'^1[3578]\d{9}$|^14[56789]\d{8}$')
         if regular.match(mobile):
             return True
         else:

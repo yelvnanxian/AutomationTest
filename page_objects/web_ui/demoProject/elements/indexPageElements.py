@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：定义indexPageElements页面或界面的元素定位信息。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from page_objects.createElement import CreateElement
 from page_objects.web_ui.wait_type import Wait_Type as Wait_By
 from page_objects.web_ui.locator_type import Locator_Type

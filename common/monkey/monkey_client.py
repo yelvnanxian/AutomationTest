@@ -1,16 +1,16 @@
+"""作用：封装monkey client客户端的连接和访问能力。"""
+
 #
 # monkey_client.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2021-05-18T21:08:38.694Z+08:00
 # @last-modified 2021-06-09T21:51:42.306Z+08:00
-# github https://github.com/yanchunhuo
 from common.dateTimeTool import DateTimeTool
 import platform
 import subprocess
 
 class Monkey_Client:
-    
+
     def start_android_monkey(self, udid: str, package: str, std_log_file_path: str, err_log_file_path,
                              throttle: int = 100,
                              event_times: int = 100000, ):
@@ -18,7 +18,7 @@ class Monkey_Client:
                         % (udid, package, int(throttle), int(event_times), std_log_file_path, err_log_file_path)
         sub_p = subprocess.Popen(start_command, shell=True)
         return sub_p
-    
+
     def stop_android_monkey(self,udid:str,sub_p=None):
         if sub_p:
             sub_p.kill()
@@ -49,4 +49,3 @@ class Monkey_Client:
                 return result
             except:
                 print('%s关闭monkey进程,进程id:%s'%(DateTimeTool.getNowTime(),monkey_process_id))
-        

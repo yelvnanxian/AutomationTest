@@ -1,7 +1,8 @@
+"""作用：封装aliyun mns client客户端的连接和访问能力。"""
+
 #
 # aliyun_mns_client.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2022-05-11T15:21:50.951Z+08:00
 # @last-modified 2022-05-11T20:12:06.029Z+08:00
 # Python SDK Version 1.1.6
@@ -31,7 +32,7 @@ class Aliyun_MNS_Client:
         """
         queue=self.account.get_queue(queue_name)
         return queue
-    
+
     def create_queue(self,queue_name:str,queue_meta=None):
         """仅支持 字母、数字、- 的命名
 
@@ -47,7 +48,7 @@ class Aliyun_MNS_Client:
             queue_meta=QueueMeta()
         queue_url=queue.create(queue_meta=queue_meta)
         return queue_url
-    
+
     def send_queue_message(self,queue_name:str,msg_body:str='',delay_seconds=None,priority=None):
         """_summary_
 
@@ -64,7 +65,7 @@ class Aliyun_MNS_Client:
         message=Message(message_body=msg_body,delay_seconds=delay_seconds,priority=priority)
         result=queue.send_message(message=message)
         return result
-    
+
     def receive_queue_message(self,queue_name:str,wait_seconds:int=-1,is_base64=False):
         """_summary_
 
@@ -79,15 +80,15 @@ class Aliyun_MNS_Client:
         queue.set_encoding(is_base64)
         result=queue.receive_message(wait_seconds=wait_seconds)
         return result
-    
+
     def delete_queue_message(self,queue_name:str,receipt_handle:str):
         queue=self.account.get_queue(queue_name)
         queue.delete_message(receipt_handle=receipt_handle)
-    
+
     def delete_queue(self,queue_name:str):
         queue=self.account.get_queue(queue_name)
         queue.delete()
-    
+
     def get_topic(self,topic_name:str):
         """
 
@@ -99,7 +100,7 @@ class Aliyun_MNS_Client:
         """
         topic=self.account.get_topic(topic_name=topic_name)
         return topic
-    
+
     def create_topic(self,topic_name:str,topic_meta=None,maximum_message_size=-1):
         """_summary_
 
@@ -116,7 +117,7 @@ class Aliyun_MNS_Client:
             topic_meta=TopicMeta(maximum_message_size=maximum_message_size)
         topic_url=topic.create(topic_meta=topic_meta)
         return topic_url
-    
+
     def create_topic_subscribe(self,subscribe_name:str,topic_name:str,queue_name:str,region:str=None,
                                notify_strategy="",notify_content_format="", filter_tag=""):
         topic=self.account.get_topic(topic_name=topic_name)
@@ -130,7 +131,7 @@ class Aliyun_MNS_Client:
         # 创建订阅
         topic_url=subscribe.subscribe(subscription_meta=subscribe_meta)
         return topic_url
-    
+
     def send_topic_message(self,topic_name:str,msg_body:str='',message_tag:str="",direct_mail=None, direct_sms=None):
         """_summary_
 
@@ -148,8 +149,7 @@ class Aliyun_MNS_Client:
         message=TopicMessage(message_body=msg_body,message_tag=message_tag,direct_mail=direct_mail,direct_sms=direct_sms)
         result=topic.publish_message(message=message)
         return result
-    
+
     def delete_topic(self,topic_name:str):
         topic=self.account.get_topic(topic_name=topic_name)
         topic.delete()
-    

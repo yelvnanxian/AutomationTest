@@ -1,0 +1,16 @@
+{
+  "name": "automation-test-tooling",
+  "description": "提供AutomationTest项目的Node.js与Appium运行环境。",
+  "private": true,
+  "engines": {
+    "node": ">=22 <23",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "appium": "appium",
+    "appium:drivers": "appium driver list --installed"
+  },
+  "devDependencies": {
+    "appium": "3.6.0"
+  }
+}

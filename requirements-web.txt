@@ -1,0 +1,10 @@
+# 作用：记录requirements-web相关的依赖或文本配置。
+
+selenium==4.47.0
+pytest==8.4.2
+pytest-xdist==3.8.0
+pytest-rerunfailures==16.5
+allure-pytest==2.16.0
+requests==2.34.2
+Pillow==12.3.0
+ujson==5.11.0

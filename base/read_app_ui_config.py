@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
-# 作者 yanchunhuo
+"""作用：读取并解析app ui config所需的配置。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from pojo.app_ui_config import APP_UI_Config
 import configparser as ConfigParser
 

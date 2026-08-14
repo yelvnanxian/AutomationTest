@@ -1,6 +1,6 @@
-# @Author  : yanchunhuo
+"""作用：执行http server init相关的运行前初始化。"""
+
 # @Time    : 2020/1/19 14:33
-# github https://github.com/yanchunhuo
 from base.read_httpserver_config import Read_Http_Server_Config
 from common.dateTimeTool import DateTimeTool
 from common.strTool import StrTool
@@ -55,4 +55,3 @@ def http_server_init():
     p = multiprocessing.Process(target=start_http_server,args=(port,))
     p.daemon = True
     p.start()
-

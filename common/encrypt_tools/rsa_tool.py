@@ -1,7 +1,8 @@
+"""作用：提供rsa tool相关的通用工具能力。"""
+
 #
 # rsa_tool.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2022-03-04T14:25:11.785Z+08:00
 # @last-modified 2022-03-04T17:08:23.332Z+08:00
 #
@@ -12,7 +13,7 @@ import base64
 class RSA_Tool:
     def __init__(self) -> None:
         pass
-    
+
     def rsa_encrypt(self,public_key,text:str,hashAlgo=None):
         """_summary_
 
@@ -31,7 +32,7 @@ class RSA_Tool:
         cipher=PKCS1_OAEP.new(public_key,hashAlgo)
         encrypted_text=cipher.encrypt(text)
         return base64.b64encode(encrypted_text).decode('utf-8')
-    
+
     def rsa_decrypt(self,private_key,encrypted_text:str,hashAlgo=None):
         """_summary_
 
@@ -50,7 +51,7 @@ class RSA_Tool:
         cipher=PKCS1_OAEP.new(private_key,hashAlgo)
         text=cipher.decrypt(encrypted_text)
         return text.decode('utf-8')
-    
+
     def generator_key(self,bits:int=2048):
         key=RSA.generate(bits)
         private_key=key.export_key()

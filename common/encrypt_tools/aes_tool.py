@@ -1,10 +1,10 @@
+"""作用：提供aes tool相关的通用工具能力。"""
+
 #
 # aes_tool.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2021-09-06T18:28:10.458Z+08:00
 # @last-modified 2023-09-05T18:11:41.678Z+08:00
-# github https://github.com/yanchunhuo
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad,unpad
 import base64
@@ -21,7 +21,7 @@ class AESTool:
         self.key=key.encode('utf-8')
         if iv:
             self.iv=iv.encode('utf-8')
-    
+
     def encrypt_cbc(self,text:str):
         """
         AES的CBC模式加密,返回base64
@@ -62,7 +62,7 @@ class AESTool:
         cipher = AES.new(self.key, mode)
         encrypted_text = cipher.encrypt(text.encode('utf-8'))
         return base64.b64encode(encrypted_text).decode('utf-8')
-    
+
     def encrypt_ecb_pad(self,text:str,is_base64:bool=True):
         """AES/CBC/PKCS5padding加密
 
@@ -81,7 +81,7 @@ class AESTool:
             return base64.b64encode(encrypted_text).decode('utf-8')
         else:
             return encrypted_text
-        
+
     def decrypt_ecb_pad(self,encrypted_text:Union[str,bytes],is_base64:bool=True):
         """AES/CBC/PKCS5padding解密
 

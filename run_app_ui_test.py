@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：提供app ui test流程的命令行执行入口。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from base.read_app_ui_config import Read_APP_UI_Config
 from base.read_app_ui_devices_info import Read_APP_UI_Devices_Info
 from common.httpclient.doRequest import DoRequest
@@ -20,12 +20,12 @@ import sys
 import ujson
 
 def pytest_main(pytest_execute_params):
-    exit_code = pytest.main(pytest_execute_params)
+    sys.exit(pytest.main(pytest_execute_params))
 
 def start_app_device_test(index,device_info,keyword,dir,markexpr,capture,reruns,lf,clr):
     for path, dirs, files in os.walk('config/app_ui_tmp'):
         for file in files:
-            if(int(file)==index):
+            if file.isdigit() and int(file)==index:
                 os.rename(os.path.join(path,file),os.path.join(path,str(os.getpid())))
 
     print('%s开始检测appium server是否可用......'%DateTimeTool.getNowTime())
@@ -33,7 +33,8 @@ def start_app_device_test(index,device_info,keyword,dir,markexpr,capture,reruns,
         doRquest = DoRequest('http://'+device_info['server_ip']+':%s/wd/hub'%device_info['server_port'].strip())
         httpResponseResult = doRquest.get('/status')
         result = ujson.loads(httpResponseResult.body)
-        if result['status'] == 0:
+        value = result.get('value', {})
+        if result.get('status') == 0 or (isinstance(value, dict) and value.get('ready') is True):
             print('%sappium server状态为可用......'%DateTimeTool.getNowTime())
         else:
             sys.exit('%sappium server状态为不可用'%DateTimeTool.getNowTime())
@@ -89,6 +90,8 @@ def start_app_device_test(index,device_info,keyword,dir,markexpr,capture,reruns,
         process = multiprocessing.Process(target=pytest_main,args=(pytest_execute_params,))
         process.start()
         process.join()
+        if process.exitcode != 0:
+            raise RuntimeError('设备%s的测试执行失败，退出码:%s' % (device_info['device_desc'], process.exitcode))
         print('%s当前设备结束测试的desired_capabilities为:%s' % (DateTimeTool.getNowTime(),desired_capabilities))
     print('%s结束设备%s测试......'%(DateTimeTool.getNowTime(),device_info['device_desc']))
 
@@ -129,6 +132,7 @@ if __name__=='__main__':
     clr=args.clr
     test_type=args.test_type.lower()
     devices_info_file=args.devices_info_file
+    exit_code = 0
     if test_type=='phone':
         if not devices_info_file:
             sys.exit('请指定多设备并行信息文件,查看帮助:python run_app_ui_test.py --help')
@@ -140,11 +144,18 @@ if __name__=='__main__':
             FileTool.truncateDir('config/app_ui_tmp/')
         else:
             os.mkdir('config/app_ui_tmp')
+        async_results = []
         for i in range(len(devices_info)):
             device_info=devices_info[i]
             FileTool.writeObjectIntoFile(device_info,'config/app_ui_tmp/'+str(i))
-            p=p_pool.apply_async(start_app_device_test,(i,device_info,keyword,dir,markexpr,capture,reruns,lf,clr))
+            async_results.append(p_pool.apply_async(start_app_device_test,(i,device_info,keyword,dir,markexpr,capture,reruns,lf,clr)))
         p_pool.close()
+        for async_result in async_results:
+            try:
+                async_result.get()
+            except Exception as e:
+                exit_code = 1
+                print('%s设备测试执行异常:%s' % (DateTimeTool.getNowTime(), e))
         p_pool.join()
     else:
         # 执行pytest前的参数准备
@@ -183,3 +194,4 @@ if __name__=='__main__':
     # 当Python线程中执行jpype相关代码时会出现无法关闭jvm卡死的情况，故不进行主动关闭jvm，Python主进程结束自动关闭
     # print '关闭jvm......'
     # jpype.shutdownJVM()
+    sys.exit(exit_code)

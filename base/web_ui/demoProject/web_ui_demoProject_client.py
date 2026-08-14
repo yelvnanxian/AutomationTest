@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
-# 作者 yanchunhuo
+"""作用：封装web ui demoProject client客户端的连接和访问能力。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from base.web_ui.demoProject.web_ui_demoProject_read_config import WEB_UI_DemoProject_Read_Config
 from base.read_web_ui_config import Read_WEB_UI_Config
 from common.selenium.browserOperator import BrowserOperator

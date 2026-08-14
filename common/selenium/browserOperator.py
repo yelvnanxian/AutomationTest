@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：提供browserOperator相关的通用工具能力。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from base.read_web_ui_config import Read_WEB_UI_Config
 from common.dateTimeTool import DateTimeTool
 from pojo.elementInfo import ElementInfo
@@ -360,8 +360,8 @@ class BrowserOperator:
                 self._driver.execute_script("arguments[0].scrollIntoView();", webElement)
             else:
                 self._driver.execute_script("arguments[0].scrollIntoView(false);", webElement)
-    
-            
+
+
     def move_by_offset(self,x,y):
         """鼠标左键点击，x为横坐标，y为纵坐标
 
@@ -576,4 +576,4 @@ class BrowserOperator:
         return self._driver
 
     def close(self):
-        self._driver.__exit__()
+        self._driver.quit()

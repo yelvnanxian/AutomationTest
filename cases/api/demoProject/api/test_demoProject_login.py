@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：定义demoProject login相关的自动化测试用例。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from common.hamcrest.hamcrest import assert_that
 from base.api.demoProject.api_demoProject_client import API_DemoProject_Client
 import pytest

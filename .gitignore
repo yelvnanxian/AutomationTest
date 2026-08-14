@@ -1,3 +1,5 @@
+# 作用：定义Git版本控制需要忽略的文件和目录。
+
 *.log*
 *.idea*
 *.pyc*
@@ -14,3 +16,6 @@
 *packages*
 *.vscode*
 *ychtest.py*
+.venv/
+node_modules/
+.appium/

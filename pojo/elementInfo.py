@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：定义或承载elementInfo相关的数据结构。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 class ElementInfo:
     def __init__(self):
         self.locator_type=None

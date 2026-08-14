@@ -1,4 +1,5 @@
-# @Author  : yanchunhuo
+"""作用：提供pytest相关的通用工具能力。"""
+
 # @Time    : 2020/1/15 14:08
 import platform
 
@@ -17,5 +18,3 @@ def deal_pytest_ini_file():
                 tmp_pytest_f.write(content)
                 tmp_pytest_f.close()
         pytest_f.close()
-
-

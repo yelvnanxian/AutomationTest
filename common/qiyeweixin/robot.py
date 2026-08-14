@@ -1,7 +1,8 @@
+"""作用：提供robot相关的通用工具能力。"""
+
 #
 # robot.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2022-02-07T16:27:32.733Z+08:00
 # @last-modified 2022-02-12T21:56:54.813Z+08:00
 # https://developer.work.weixin.qq.com/document/path/91770

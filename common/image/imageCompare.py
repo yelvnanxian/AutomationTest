@@ -1,6 +1,6 @@
-# 作者 yanchunhuo
+"""作用：提供imageCompare相关的通用工具能力。"""
+
 # 创建时间 2020/2/26 10:00
-# github https://github.com/yanchunhuo
 from skimage.metrics import structural_similarity
 import cv2
 

@@ -1,3 +1,3 @@
-# 作者 yanchunhuo
+"""作用：初始化common.image包并定义其模块边界。"""
+
 # 创建时间 2020/2/26 10:00
-# github https://github.com/yanchunhuo

@@ -1,3 +1,5 @@
+"""作用：提供custom matchers相关的通用工具能力。"""
+
 from hamcrest.core.base_matcher import BaseMatcher
 from hamcrest.core.helpers.hasmethod import hasmethod
 
@@ -11,10 +13,10 @@ class Is_True(BaseMatcher):
             return True
         else:
             return False
-    
+
     def describe_to(self, description) -> None:
         description.append_text('True')
-    
+
 def h_is_true():
     return Is_True()
 
@@ -31,9 +33,9 @@ class Is_Empty(BaseMatcher):
                 return True
         else:
             return False
-    
+
     def describe_to(self, description) -> None:
         description.append_text('Empty')
-        
+
 def h_is_empty():
     return Is_Empty()

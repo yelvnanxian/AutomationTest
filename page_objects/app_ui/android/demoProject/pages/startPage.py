@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
-# 作者 yanchunhuo
+"""作用：封装startPage页面的用户操作和状态读取。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from page_objects.app_ui.android.demoProject.elements.startPageElements import StartPageElements
 from page_objects.app_ui.android.demoProject.pages.indexPage import IndexPage
 

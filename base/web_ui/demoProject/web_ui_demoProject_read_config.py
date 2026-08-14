@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
-# 作者 yanchunhuo
+"""作用：读取并解析web ui demoProject config所需的配置。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from pojo.web_ui.demoProject.demoProjectConfig import DemoProjectConfig
 import configparser as ConfigParser
 

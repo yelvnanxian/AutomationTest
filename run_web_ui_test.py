@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：提供web ui test流程的命令行执行入口。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from base.read_web_ui_config import Read_WEB_UI_Config
 from common.dateTimeTool import DateTimeTool
 from common.fileTool import FileTool
@@ -9,8 +9,6 @@ from common.httpclient.doRequest import DoRequest
 from common.pytest import deal_pytest_ini_file
 from init.web_ui.web_ui_init import web_ui_init
 from init.java.java_maven_init import java_maven_init
-from selenium.webdriver.remote.remote_connection import RemoteConnection
-from selenium.webdriver.remote.command import Command
 import argparse
 import ujson
 import pytest
@@ -33,7 +31,8 @@ if __name__=='__main__':
         doRquest=DoRequest(Read_WEB_UI_Config().web_ui_config.selenium_hub)
         httpResponseResult=doRquest.get('/status')
         result=ujson.loads(httpResponseResult.body)
-        if result['status']==0:
+        value = result.get('value', {})
+        if result.get('status') == 0 or (isinstance(value, dict) and value.get('ready') is True):
             print('%sselenium server状态为可用......'%DateTimeTool.getNowTime())
         else:
             sys.exit('%sselenium server状态为不可用'%DateTimeTool.getNowTime())
@@ -95,17 +94,6 @@ if __name__=='__main__':
         if not tmp_exit_code==0:
             exit_code=tmp_exit_code
         print('%s结束%s浏览器测试......'%(DateTimeTool.getNowTime(),current_browser))
-    
-    print('%s清除未被关闭的浏览器......'%DateTimeTool.getNowTime())
-    try:
-        conn=RemoteConnection(Read_WEB_UI_Config().web_ui_config.selenium_hub,True)
-        sessions=conn.execute(Command.GET_ALL_SESSIONS,None)
-        sessions=sessions['value']
-        for session in sessions:
-            session_id=session['id']
-            conn.execute(Command.QUIT,{'sessionId':session_id})
-    except Exception as e:
-        print('%s清除未关闭浏览器异常:\r\n%s'%(DateTimeTool.getNowTime(),e.args.__str__()))
-    print('%s清除未被关闭的浏览器完成......'%DateTimeTool.getNowTime())
 
     print('%s结束测试......'%DateTimeTool.getNowTime())
+    sys.exit(exit_code)

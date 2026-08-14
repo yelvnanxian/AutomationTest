@@ -1,10 +1,10 @@
+"""作用：提供app ui monkey test流程的命令行执行入口。"""
+
 #
 # run_app_ui_monkey_test.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2021-05-20T17:15:52.185Z+08:00
 # @last-modified 2021-09-26T18:22:40.222Z+08:00
-# github https://github.com/yanchunhuo
 from common.dateTimeTool import DateTimeTool
 from common.pytest import deal_pytest_ini_file
 import argparse

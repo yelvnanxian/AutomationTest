@@ -1,4 +1,5 @@
-# @Author  : yanchunhuo
+"""作用：提供dictTool相关的通用工具能力。"""
+
 # @Time    : 2020/4/15 11:01
 
 class DictTool:
@@ -27,4 +28,3 @@ class DictTool:
         for i in list:
             data_result[i] = data[i]
         return data_result
-

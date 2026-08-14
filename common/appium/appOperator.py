@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：提供appOperator相关的通用工具能力。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 
 from appium.webdriver.common.touch_action import TouchAction
 from appium.webdriver.common.multi_action import MultiAction
@@ -71,7 +71,7 @@ class AppOperator:
         webElement=self._change_element_to_webElement_type(element)
         if webElement:
             webElement.click()
-        
+
     def click_web_element(self,element):
         """由于混合应用存在点击无效的情况，故混合应用的点击采用selenium的tab操作确保能够正常点击
 
@@ -250,7 +250,7 @@ class AppOperator:
         """
         alert=self._driver.switch_to.alert
         return alert.text
-    
+
     def scroll_to_show(self,element,is_top_align=True):
         """
         仅适用于web,滚动页面直至元素可见
@@ -418,7 +418,7 @@ class AppOperator:
 
     def get_window_size(self):
         return self._driver.get_window_size()
-    
+
     def get_window_rect(self):
         return self._driver.get_window_rect()
 
@@ -1113,13 +1113,13 @@ class AppOperator:
             actions.press(x=start_x, y=start_y).wait(duration)
             actions.move_to(x=end_x, y=end_y)
             actions.perform()
-            
+
     def tap(self,x:float,y:float,duration=None):
         """点击坐标
 
         Args:
-            x (float): 
-            y (float): 
+            x (float):
+            y (float):
             duration ([type], optional): [description]. Defaults to None.
         """
         self._driver.tap([(x,y)],duration)
@@ -1485,7 +1485,7 @@ class AppOperator:
         elif locator_type == Locator_Type.ACCESSIBILITY_ID:
             subWebElements = WebDriverWait(webElement, wait_seconds).until(lambda webElement: webElement.find_elements_by_accessibility_id(locator_value))
         elif locator_type == Locator_Type.IMAGE:
-            subWebElements = WebDriverWait(webElement, wait_seconds).until(lambda webElement: webElement.find_elements_by_image(locator_type))
+            subWebElements = WebDriverWait(webElement, wait_seconds).until(lambda webElement: webElement.find_elements_by_image(locator_value))
         elif locator_type == Locator_Type.ANDROID_UIAUTOMATOR:
             subWebElements = WebDriverWait(webElement, wait_seconds).until(lambda webElement: webElement.find_elements_by_android_uiautomator(locator_value))
         elif locator_type == Locator_Type.ANDROID_DATA_MATCHER:

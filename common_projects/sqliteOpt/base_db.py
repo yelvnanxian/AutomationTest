@@ -1,24 +1,24 @@
+"""作用：封装base db相关的项目公共业务能力。"""
+
 #
 # base_db.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2022-08-04T09:52:09.525Z+08:00
 # @last-modified 2023-03-28T13:14:23.295Z+08:00
-# github https://github.com/yanchunhuo
 
 class Base_DB:
     def __init__(self,db_session,model) -> None:
         self.db_session=db_session
         self.model=model
-    
+
     def filter_object(self,obj:object,order_by_columns:list=None):
         """_summary_
 
         Args:
             obj (object): _description_
-            order_by_columns (list, optional): 
+            order_by_columns (list, optional):
                 数据库字段名，如需降序使用desc方法，例：
-                from sqlalchemy import desc                
+                from sqlalchemy import desc
                 ['AGENT_ID',desc('ROLE_ID')]. Defaults to None.
 
         Returns:
@@ -44,9 +44,9 @@ class Base_DB:
             obj (object): _description_
             page_index (int, optional): _description_. Defaults to None.
             page_size (int, optional): _description_. Defaults to None.
-            order_by_columns (list, optional): 
+            order_by_columns (list, optional):
                 数据库字段名，如需降序使用desc方法，例：
-                from sqlalchemy import desc                
+                from sqlalchemy import desc
                 ['AGENT_ID',desc('ROLE_ID')]. Defaults to None.
 
         Returns:
@@ -72,7 +72,7 @@ class Base_DB:
             self.db_session.rollback()
             raise
         return result_objects
-    
+
     def add_object(self,obj:object):
         try:
             self.db_session.add(obj)
@@ -80,7 +80,7 @@ class Base_DB:
         except:
             self.db_session.rollback()
             raise
-        
+
     def add_objects(self, objs: list = []):
         try:
             self.db_session.bulk_save_objects(objs)
@@ -88,7 +88,7 @@ class Base_DB:
         except:
             self.db_session.rollback()
             raise
-        
+
     def delete_object(self,obj:object):
         attrs=(obj.__dict__).copy()
         attrs.pop('_sa_instance_state')
@@ -99,7 +99,7 @@ class Base_DB:
             self.db_session.rollback()
             raise
         return num
-    
+
     def empty_table(self):
         try:
             num=self.db_session.query(self.model).delete()
@@ -108,7 +108,7 @@ class Base_DB:
             self.db_session.rollback()
             raise
         return num
-    
+
     def update_object(self,old_obj:object,new_obj):
         """变更的new_obj，如果需要将某个字段更新为Null，则设置字段值为'null'
 
@@ -132,7 +132,7 @@ class Base_DB:
         except:
             self.db_session.rollback()
             raise
-        
+
     def update_objects(self,old_obj:object,new_obj):
         """变更的new_obj，如果需要将某个字段更新为Null，则设置字段值为'null'
 

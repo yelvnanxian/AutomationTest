@@ -1,4 +1,5 @@
-# @Author  : yanchunhuo
+"""作用：定义baidu index相关的性能测试任务。"""
+
 # @Time    : 2020/1/6 9:37
 from locust import TaskSet,task,between
 from locust.contrib.fasthttp import FastHttpLocust

@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：封装dubboClient客户端的连接和访问能力。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from common.java.javaTools import StartJpypeJVM
 import jpype
 import ujson

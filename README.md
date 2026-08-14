@@ -1,10 +1,4 @@
-<!--
-### [感谢Thordata]()
-Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发者提供稳定、高效的海外代理 IP 服务。注册即可免费试用1GB住宅代理，并获得 2000 次免费 SERP API 调用。
-<a href="https://www.thordata.com/?ls=github&lk=automationtest" target="_blank">
-    <img src="https://github.com/yanchunhuo/resources/blob/master/APIAutomationTest/Thordata.png" alt="Thordata">
-</a>
--->
+<!-- 作用：说明README相关的使用方式和设计信息。 -->
 
 # [自动化测试]()
 
@@ -32,9 +26,10 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
     * Js2Py：用于执行js代码，https://github.com/PiotrDabkowski/Js2Py
     * sqlacodegen：用于根据数据库表结构生成python对象，https://github.com/agronholm/sqlacodegen
     * SQLAlchemy：SQL工具包及对象关系映射（ORM）工具，https://github.com/sqlalchemy/sqlalchemy
-* 当前仅支持Python>=3.6，建议安装Python V3.6.8版本
+* 当前锁定的第三方依赖以Python 3.6.8为兼容基线，不保证兼容Python 3.10及以上版本
+* GitHub CI只执行不依赖外部服务的语法和安全基线检查；完整测试仍需按下文准备Selenium、Appium、数据库和Allure环境
 * 项目如需执行java代码(即使用jpype1)，则项目目录所在的路径不可包含中文
-    
+
 # [使用]()
 ## 一、环境准备
 ### 1、脚本运行环境准备
@@ -62,7 +57,7 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
 #### 1.3、安装allure
 * 源安装
     * sudo apt-add-repository ppa:qameta/allure
-    * sudo apt-get update 
+    * sudo apt-get update
     * sudo apt-get install allure
     * 其他安装方式：https://github.com/allure-framework/allure2
 * 手动安装
@@ -90,8 +85,8 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
             * unzip instantclient-basic-linux.x64-18.3.0.0.0dbru.zip
             * export LD_LIBRARY_PATH=/home/john/oracle_instant_client/instantclient_18_3:$LD_LIBRARY_PATH
         * 中文编码设置
-        
-            ```python 
+
+            ```python
             import os
             os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
             ```
@@ -100,7 +95,7 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
     * 下载安装包instantclient-basic-windows.x64-11.2.0.4.0.zip
     * 解压zip包,并配置环境变量
         * 系统环境变量加入D:\instantclient-basic-windows.x64-11.2.0.4.0\instantclient_11_2
-        * 配置中文编码,环境变量创建NLS_LANG=SIMPLIFIED CHINESE_CHINA.UTF8  
+        * 配置中文编码,环境变量创建NLS_LANG=SIMPLIFIED CHINESE_CHINA.UTF8
     * 注意:如果使用64位,python和instantclient都需要使用64位
 
 #### 1.7、图像识别字库准备
@@ -130,7 +125,7 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
 ### 2、selenium server运行环境准备
 #### 2.1、安装jdk1.8,并配置环境变量
 * export JAVA_HOME=/usr/lib/jvm/jdk8
-* export JRE_HOME=${JAVA_HOME}/jre 
+* export JRE_HOME=${JAVA_HOME}/jre
 * export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
 * export PATH=${JAVA_HOME}/bin:$PATH
 
@@ -165,7 +160,7 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
 ### 3、appium server运行环境准备
 #### 3.1、安装jdk1.8,并配置环境变量
 * export JAVA_HOME=/usr/lib/jvm/jdk8
-* export JRE_HOME=${JAVA_HOME}/jre 
+* export JRE_HOME=${JAVA_HOME}/jre
 * export CLASSPATH=.:${JAVA_HOME}/lib:${JRE_HOME}/lib
 * export PATH=${JAVA_HOME}/bin:$PATH
 
@@ -179,7 +174,7 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
     * 安装java(JDK),并配置JAVA_HOME=/usr/lib/jvm/jdk8
     * 安装Android SDK,并配置ANDROID_HOME="/usr/local/adt/sdk"
     * 使用SDK manager安装需要进行自动化的Android API版本
-    
+
 * IOS环境准备
     * 由于测试IOS真实设备没办法直接操作web view，需要通过usb，实现通过usb创建连接需要安装ios-webkit-debug-proxy
     * 下载安装地址：https://github.com/google/ios-webkit-debug-proxy/tree/v1.8.5
@@ -231,10 +226,11 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
 ### 3、app ui测试
 * cd AutomationTest/
 * python3 -u run_app_ui_test.py --help
-* python3 -u run_app_ui_test.py 运行cases/app_ui/目录所有的用例
-* python3 -u run_app_ui_test.py -tt phone -k keyword 运行匹配关键字的用例，会匹配文件名、类名、方法名
-* python3 -u run_app_ui_test.py -tt phone -d dir     运行指定目录的用例，默认运行cases/app_ui/目录
-* python3 -u run_app_ui_test.py -m mark              运行指定标记的用例
+* python3 -u run_app_ui_test.py -tt windows 运行Windows App UI用例
+* python3 -u run_app_ui_test.py -tt phone -dif config/demoProject/app_ui_android_devices_info_demoProject.conf 运行手机App UI用例
+* python3 -u run_app_ui_test.py -tt phone -dif config/demoProject/app_ui_android_devices_info_demoProject.conf -k keyword 运行匹配关键字的用例
+* python3 -u run_app_ui_test.py -tt windows -d dir 运行指定目录的用例，默认运行cases/app_ui/目录
+* python3 -u run_app_ui_test.py -tt windows -m mark 运行指定标记的用例
 
 ### 4、性能测试
 * cd AutomationTest/
@@ -244,19 +240,19 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
 ## 四、生成测试报告
 ### 1、API测试
 * cd AutomationTest/
-* python3 -u generate_api_test_report.py -p 9080 
+* python3 -u generate_api_test_report.py -p 9080
 * 访问地址http://ip:9080
 * 在使用Ubuntu进行报告生成时，请勿使用sudo权限，否则无法生成，allure不支持
 
 ### 2、web ui测试
 * cd AutomationTest/
-* python3 -u generateReport_web_ui_test_report.py -ieport 9081 -chromeport 9082 -firefoxport 9083
+* python3 -u generate_web_ui_test_report.py -ip 9081 -cp 9082 -fp 9083
 * 访问地址http://ip:908[1-3]
 * 在使用Ubuntu进行报告生成时，请勿使用sudo权限，否则无法生成，allure不支持
 
 ### 3、app ui测试
 * cd AutomationTest/
-* python3 -u generateReport_app_ui_test_report.py -sp 9084
+* python3 -u generate_app_ui_test_report.py -sp 9084
 * 访问地址http://ip:9084
 
 ### 注：在使用Ubuntu进行报告生成时，请勿使用sudo权限，否则无法生成，allure不支持
@@ -265,7 +261,7 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
 ### 1、API测试
 * 项目
     * demoProject 例子项目
-        
+
 ### 2、web ui测试
 * 元素的显式等待时间默认为30s
 * 封装的显式等待类型支持:page_objects/web_ui/wait_type.py
@@ -275,13 +271,13 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
 * 无头浏览器暂不支持ie浏览器
 * 项目
     * demoProject 例子项目
-        
+
 ### 3、app ui测试
 * 元素的显式等待时间默认为30s
 * 封装的显式等待类型支持:page_objects/app_ui/wait_type.py
 * 封装的定位类型支持:page_objects/app_ui/locator_type.py
 * 项目
-    * android 
+    * android
         * demoProject 例子项目
 
 # [项目结构]()
@@ -292,7 +288,7 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
 * config　配置文件
 * init 初始化
 * logs 日志目录
-* output 测试结果输出目录 
+* output 测试结果输出目录
 * packages app ui测试的安装包
 * page_objects 页面映射对象
 * pojo 存放自定义类对象
@@ -337,11 +333,3 @@ Thordata：可靠且性价比高的海外代理IP提供商。为企业和开发�
     * 视频录制统一对单个单个case进行，保证录制时间不超过3分钟，且录制文件不要过大，否则会引起手机内存无法存储视频
             * 确认手机是否能进行视频录制执行命令adb shell screenrecord /sdcard/test.mp4，能正常执行即可
     * 设备屏幕坐标系原点都在最左上角，往右x轴递增，往下y轴递增
-
-# [进交流群]()
-![avatar](https://github.com/yanchunhuo/resources/blob/master/wechat.png =200x)
-
-
-[![Stargazers over time](https://starchart.cc/yanchunhuo/AutomationTest.svg)](https://starchart.cc/yanchunhuo/AutomationTest)
-
-[![Top Langs](https://profile-counter.glitch.me/yanchunhuo/count.svg)](https://github.com/yanchunhuo)

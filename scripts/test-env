@@ -1,0 +1,15 @@
+#!/bin/sh
+PROJECT_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+export APPIUM_HOME="$PROJECT_ROOT/.appium"
+export PATH="$PROJECT_ROOT/.venv/bin:$PROJECT_ROOT/node_modules/.bin:/opt/homebrew/opt/openjdk@21/bin:/opt/homebrew/opt/node@22/bin:$PATH"
+export PYTHONNOUSERSITE=1
+
+if [ "$#" -eq 0 ]; then
+    echo "用法: ./scripts/test-env <命令> [参数...]"
+    echo "示例: ./scripts/test-env python --version"
+    exit 1
+fi
+
+exec "$@"

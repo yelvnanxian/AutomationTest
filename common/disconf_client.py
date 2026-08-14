@@ -1,6 +1,6 @@
-# @Author  : yanchunhuo
+"""作用：封装disconf client客户端的连接和访问能力。"""
+
 # @Time    : 2020/7/21 10:24
-# github https://github.com/yanchunhuo
 from common.httpclient.doRequest import DoRequest
 import ujson
 
@@ -75,4 +75,3 @@ class DisconfClient:
         httpResponseResult = self.doRequest.put('/api/web/config/filetext/%s' % config_id,params)
         config_info = ujson.loads(httpResponseResult.body)
         return config_info
-

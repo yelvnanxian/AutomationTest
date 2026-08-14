@@ -1,10 +1,10 @@
+"""作用：提供sqlalchemy mysql tool相关的通用工具能力。"""
+
 #
 # sqlalchemy_mysql_tool.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2022-07-21T18:07:28.086Z+08:00
 # @last-modified 2022-07-25T19:58:02.887Z+08:00
-# github https://github.com/yanchunhuo
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session
@@ -16,7 +16,7 @@ class SQLAlchemy_Mysql_Tool:
         self.url='mysql+%s://%s:%s@%s:%s/%s'%(driver_type,username,password,host,str(port),db)
         self.encoding=encoding
         self.echo=echo
-        
+
     def get_session(self):
         engine=create_engine(url=self.url,encoding=self.encoding,echo=self.echo)
         # 线程安全

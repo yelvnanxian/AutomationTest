@@ -1,4 +1,5 @@
-# @Author  : yanchunhuo
+"""作用：读取并解析httpserver config所需的配置。"""
+
 # @Time    : 2020/1/19 14:35
 from common.network import Network
 from pojo.httpserver_config import HttpServer_Config

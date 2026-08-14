@@ -1,12 +1,12 @@
 # -*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：提供base encrypt tool相关的通用工具能力。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 import base64
 import hashlib
 
 class BaseEncryptTool:
-    
+
     @classmethod
     def md5Encode(cls, text):
         """
@@ -17,7 +17,7 @@ class BaseEncryptTool:
         m=hashlib.md5()
         m.update(text.encode('utf-8'))
         return m.hexdigest()
-    
+
     @classmethod
     def base64Encode(cls,text,encoding='utf-8'):
         return base64.b64encode(bytes(text,encoding=encoding))
@@ -25,7 +25,7 @@ class BaseEncryptTool:
     @classmethod
     def base64Decode(cls,base64Text):
         return base64.b64decode(base64Text)
-    
+
     @classmethod
     def hash_code(cls, text: str):
         h = 0
@@ -35,7 +35,7 @@ class BaseEncryptTool:
             return h
         else:
             return 0
-    
+
     @classmethod
     def sha1Encode(cls, src_str):
         """

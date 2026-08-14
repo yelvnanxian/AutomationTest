@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
-# 作者 yanchunhuo
+"""作用：封装app ui android demoProject client客户端的连接和访问能力。"""
+
 # 创建时间 2018/01/19 22:36
 from base.app_ui.android.demoProject.app_ui_android_demoProject_read_config import APP_UI_Android_DemoProject_Read_Config
 from appium import webdriver
@@ -36,7 +37,7 @@ class APP_UI_Android_demoProject_Client(object):
             self.driver = webdriver.Remote(self._appium_hub, desired_capabilities=self.current_desired_capabilities)
             self._save_last_device_session(self.driver.session_id, self.device_info['device_desc'])
             self.appOperator = AppOperator(self.driver,self._appium_hub)
-            
+
         if is_need_reset_app:
             # appium启动是非重置或者非第一次appium启动，则要进行重置
             if self.__is_first==False or self.noReset==True:
@@ -45,7 +46,7 @@ class APP_UI_Android_demoProject_Client(object):
             # appium启动是非重置或者非第一次appium启动，则要进行重启进程
             if self.__is_first==False or self.noReset==True:
                 self.appOperator.start_activity('com.moji.mjweather','com.moji.mjweather.MainActivity')
-    
+
         self.__is_first=False
 
     def _init(self,is_init=False):

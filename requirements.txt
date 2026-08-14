@@ -1,3 +1,5 @@
+# 作用：记录requirements相关的依赖或文本配置。
+
 PyHamcrest==2.0.4
 requests==2.27.1
 Appium-Python-Client==0.48

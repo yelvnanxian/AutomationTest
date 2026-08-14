@@ -1,8 +1,8 @@
+"""作用：读取并解析api demoProject config所需的配置。"""
+
 #
 # api_demoProject_read_config.py
-# @author yanchunhuo
-# @description 
-# @github https://github.com/yanchunhuo
+# @description
 # @created 2021-04-13T10:59:57.605Z+08:00
 # @last-modified 2023-05-12T11:04:36.647Z+08:00
 #
@@ -20,7 +20,7 @@ class API_DemoProject_Read_Config(object):
             cls.__instance=object.__new__(cls)
         return cls.__instance
 
-    
+
     def __init__(self,config_file_path:str=None,env:str=None):
         """优先取传参配置文件，再取传参环境，最后去运行指定的环境
 
@@ -40,14 +40,20 @@ class API_DemoProject_Read_Config(object):
                     config_file_path='config/demoProject/api_demoProject_test.conf'
                 elif env.lower()=='release':
                     config_file_path='config/demoProject/api_demoProject_release.conf'
+                else:
+                    raise ValueError('不支持的环境:%s，仅支持test或release' % env)
+            if not os.path.isfile(config_file_path):
+                raise FileNotFoundError('API配置文件不存在:%s' % config_file_path)
             self.config=self._readConfig(config_file_path)
             self.env=env
-            
+
             self.__inited=True
 
     def _readConfig(self,configFile):
         config = ConfigParser.ConfigParser()
-        config.read(configFile,encoding='utf-8')
+        loaded_files = config.read(configFile,encoding='utf-8')
+        if not loaded_files:
+            raise FileNotFoundError('API配置文件无法读取:%s' % configFile)
         demoProjectConfig=DemoProjectConfig()
         demoProjectConfig.url=config.get('servers','url')
         demoProjectConfig.init=config.get('isInit','init')

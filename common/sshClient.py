@@ -1,36 +1,34 @@
 #!-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：封装sshClient客户端的连接和访问能力。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 
 import os
 import paramiko
 import stat
 
 class SSHClient:
-    def __init__(self,ip,username,port=22,password=None,is_windows=False,pkey_file=None):
+    def __init__(self,ip,username,port=22,password=None,is_windows=False,pkey_file=None,allow_unknown_host=False):
         self.ip=ip
         self.port=port
         self.username=username
         self.password=password
         self.is_windows=is_windows
         self.pkey_file=pkey_file
+        self.allow_unknown_host=allow_unknown_host
         self._setSSHClient()
 
     def _setSSHClient(self):
         self.sshclient = paramiko.SSHClient()
         self.sshclient.load_system_host_keys()
-        self.sshclient.set_missing_host_key_policy(paramiko.AutoAddPolicy)
+        if self.allow_unknown_host:
+            self.sshclient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         if self.pkey_file:
             key=paramiko.RSAKey.from_private_key_file(self.pkey_file)
             self.sshclient.connect(hostname=self.ip, port=self.port, username=self.username, pkey=key)
-            sftp = paramiko.Transport(self.ip+':'+str(self.port))
-            sftp.connect(username=self.username,pkey=key)
         else:
             self.sshclient.connect(hostname=self.ip, port=self.port, username=self.username, password=self.password)
-            sftp = paramiko.Transport(self.ip+':'+str(self.port))
-            sftp.connect(username=self.username, password=self.password)
-        self.sftpclient = paramiko.SFTP.from_transport(sftp)
+        self.sftpclient = self.sshclient.open_sftp()
 
     def ssh_exec_command(self,command,timeout=60,is_source_profile=1):
         if int(is_source_profile)==1 and not self.is_windows:
@@ -56,7 +54,7 @@ class SSHClient:
         for dirpath,dirnames,filenames in os.walk(local_dir_path):
             dirpath=dirpath.replace('\\','/')
             if not dirpath[-1] == '/':
-                dirpath += '/'                
+                dirpath += '/'
             # 创建当前路径目录
             for dirname in dirnames:
                 local_next_dirpath=dirpath+dirname
@@ -104,5 +102,5 @@ class SSHClient:
                 self.sftp_get(remote_dir_path+remote_file.filename,local_dir_path+remote_file.filename)
 
     def closeSSHAndSFTP(self):
-        self.sshclient.close()
         self.sftpclient.close()
+        self.sshclient.close()

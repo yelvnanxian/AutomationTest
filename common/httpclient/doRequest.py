@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：提供doRequest相关的通用工具能力。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from pojo.httpResponseResult import HttpResponseResult
 from requests.adapters import HTTPAdapter
 import requests
@@ -25,7 +25,7 @@ class DoRequest(object):
 
     def updateHeaders(self, headers):
         self._headers.update(headers)
-    
+
     def removeHeader(self,key):
         self._headers.pop(key)
 
@@ -46,7 +46,7 @@ class DoRequest(object):
 
     def setProxies(self,proxies):
         self._proxies=proxies
-        
+
     def setVerify(self,verify:bool=True):
         self._verify=verify
 
@@ -56,9 +56,10 @@ class DoRequest(object):
         return self._dealResponseResult(r)
 
     def post_with_file(self,path,filePath,params=None,fileKey='file',**kwargs):
-        files = {fileKey: open(filePath, 'rb')}
-        r = self._session.post(self._url+path, data=params, files=files,headers=self._headers, cookies=self._cookies,
-                          timeout=self._timeout,proxies=self._proxies,verify=self._verify,**kwargs)
+        with open(filePath, 'rb') as file_stream:
+            files = {fileKey: file_stream}
+            r = self._session.post(self._url+path, data=params, files=files,headers=self._headers, cookies=self._cookies,
+                              timeout=self._timeout,proxies=self._proxies,verify=self._verify,**kwargs)
         return self._dealResponseResult(r)
 
     def put(self,path,params=None,**kwargs):
@@ -84,15 +85,18 @@ class DoRequest(object):
         :param params:
         :return:
         """
-        r = self._session.get(self._url + path, params=params, headers=self._headers, cookies=self._cookies,
-                              timeout=self._timeout, proxies=self._proxies, verify=self._verify, **kwargs)
-        httpResponseResult = HttpResponseResult()
-        httpResponseResult.status_code=r.status_code
-        httpResponseResult.headers=self._session.headers.__str__()
-        self.updateCookies(self._session.cookies.get_dict())
-        httpResponseResult.cookies=ujson.dumps(self.getCookies())
-        with open(storeFilePath,"wb") as f:
-            f.write(r.content)
+        kwargs['stream'] = True
+        with self._session.get(self._url + path, params=params, headers=self._headers, cookies=self._cookies,
+                               timeout=self._timeout, proxies=self._proxies, verify=self._verify, **kwargs) as r:
+            httpResponseResult = HttpResponseResult()
+            httpResponseResult.status_code=r.status_code
+            httpResponseResult.headers=r.headers.__str__()
+            self.updateCookies(self._session.cookies.get_dict())
+            httpResponseResult.cookies=ujson.dumps(self.getCookies())
+            with open(storeFilePath,"wb") as f:
+                for chunk in r.iter_content(chunk_size=64 * 1024):
+                    if chunk:
+                        f.write(chunk)
         return httpResponseResult
 
     def _dealResponseResult(self,r):

@@ -1,4 +1,5 @@
-# @Author  : yanchunhuo
+"""作用：定义或承载report config相关的数据结构。"""
+
 # @Time    : 2020/7/23 17:13
 
 class Report_Config:

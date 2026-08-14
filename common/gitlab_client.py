@@ -1,9 +1,9 @@
+"""作用：封装gitlab client客户端的连接和访问能力。"""
+
 # gitlab_client.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2021-04-25T15:04:47.417Z+08:00
 # @last-modified 2023-05-12T11:10:52.530Z+08:00
-# github https://github.com/yanchunhuo
 from common.httpclient.doRequest import DoRequest
 from urllib.parse import urljoin
 import ujson
@@ -55,4 +55,3 @@ class GitlabClient:
         params={'branch':branch_name,'content':content,'commit_message':commit_message}
         httpResponsResult=self.doRequest.put('/projects/%s/repository/files/%s'%(project_id,file_path),params=params)
         return ujson.loads(httpResponsResult.body)
-

@@ -1,10 +1,10 @@
+"""作用：执行demoProjectInit相关的运行前初始化。"""
+
 #
 # demoProjectInit.py
-# @author yanchunhuo
-# @description 
+# @description
 # @created 2021-05-20T17:21:12.247Z+08:00
 # @last-modified 2021-05-20T18:04:18.506Z+08:00
-# github https://github.com/yanchunhuo
 
 class DemoProjectInit:
     def init(self,is_init=False):

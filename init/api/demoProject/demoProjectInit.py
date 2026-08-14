@@ -1,7 +1,7 @@
 #-*- coding:utf8 -*-
-# 作者 yanchunhuo
+"""作用：执行demoProjectInit相关的运行前初始化。"""
+
 # 创建时间 2018/01/19 22:36
-# github https://github.com/yanchunhuo
 from base.api.demoProject.api_demoProject_read_config import API_DemoProject_Read_Config
 
 class DemoProjectInit:
