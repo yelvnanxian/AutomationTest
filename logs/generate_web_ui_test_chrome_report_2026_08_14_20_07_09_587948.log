@@ -1,0 +1,3 @@
+Starting web server...
+Local preview server started at <http://127.0.0.1:4003>. Press <Ctrl+C> to exit
+`allure serve` is intended for local report preview only. To host a report, run `allure generate <results-dir> -o <report-dir>` and serve the generated static files with a production web server.
