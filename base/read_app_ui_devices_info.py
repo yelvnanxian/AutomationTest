@@ -1,6 +1,5 @@
 """作用：读取并解析app ui devices info所需的配置。"""
 
-# 创建时间 2019/12/26 11:15
 from pojo.app_ui_devices_info import APP_UI_Devices_Info
 import configparser as ConfigParser
 

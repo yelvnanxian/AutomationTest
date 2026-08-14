@@ -1,10 +1,5 @@
 """作用：提供sqlacodegen mysql tool相关的通用工具能力。"""
 
-#
-# sqlacodegen_too.py
-# @description
-# @created 2022-07-21T17:00:26.678Z+08:00
-# @last-modified 2022-07-25T19:57:33.428Z+08:00
 import platform
 import subprocess
 

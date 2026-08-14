@@ -1,10 +1,5 @@
 """作用：封装zookeeper client客户端的连接和访问能力。"""
 
-#
-# zookeeper_client.py
-# @description
-# @created 2021-10-20T19:00:30.289Z+08:00
-# @last-modified 2021-10-23T15:21:52.316Z+08:00
 from kazoo.client import KazooClient
 from kazoo.client import KazooState
 import os

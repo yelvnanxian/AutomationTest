@@ -1,10 +1,5 @@
 """作用：提供sqlacodegen sqlite tool相关的通用工具能力。"""
 
-#
-# sqlacodegen_sqlite_tool.py
-# @description
-# @created 2022-07-25T19:23:33.845Z+08:00
-# @last-modified 2022-07-25T19:57:36.776Z+08:00
 
 import platform
 import subprocess

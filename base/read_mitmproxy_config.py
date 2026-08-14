@@ -1,6 +1,5 @@
 """作用：读取并解析mitmproxy config所需的配置。"""
 
-# @Time    : 2020/7/15 17:30
 from common.network import Network
 from pojo.mitmproxy_config import Mitmproxy_Config
 import configparser as ConfigParser

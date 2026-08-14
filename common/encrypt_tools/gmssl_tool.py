@@ -1,10 +1,5 @@
 """作用：提供gmssl tool相关的通用工具能力。"""
 
-#
-# sm_tool.py
-# @description
-# @created 2021-09-06T17:01:21.635Z+08:00
-# @last-modified 2022-01-20T11:54:15.278Z+08:00
 from common.encrypt_tools.gmssl.sm2 import CryptSM2
 from common.encrypt_tools.gmssl.sm4 import CryptSM4
 from common.encrypt_tools.gmssl.sm4 import SM4_ENCRYPT

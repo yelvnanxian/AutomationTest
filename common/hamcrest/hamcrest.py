@@ -1,11 +1,5 @@
 """作用：提供hamcrest相关的通用工具能力。"""
 
-#
-# hamcrest.py
-# @description
-# @created 2022-11-08T18:13:31.156Z+08:00
-# @last-modified 2022-11-09T17:04:40.225Z+08:00
-#
 
 from hamcrest import assert_that as h_assert_that,equal_to,has_length,has_property,has_properties,none,not_none
 from hamcrest import is_not,not_,all_of,any_of,anything

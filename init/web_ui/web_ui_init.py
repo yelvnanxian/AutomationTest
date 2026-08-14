@@ -1,9 +1,8 @@
 #-*- coding:utf8 -*-
 """作用：执行web ui init相关的运行前初始化。"""
 
-# 创建时间 2018/01/19 22:36
 from init.java.java_maven_init import java_maven_init
-from init.web_ui.demoProject.demoProjectInit import DemoProjectInit
+from init.web_ui.demoProject.demo_project_init import DemoProjectInit
 
 def web_ui_init():
     """

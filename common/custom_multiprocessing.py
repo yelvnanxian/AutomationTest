@@ -1,11 +1,5 @@
 """作用：提供custom multiprocessing相关的通用工具能力。"""
 
-#
-# custom_multiprocessing.py
-# @description
-# @created 2022-08-20T17:27:14.632Z+08:00
-# @last-modified 2022-11-07T19:44:59.558Z+08:00
-#
 # 参考 https://stackoverflow.com/questions/52948447/error-group-argument-must-be-none-for-now-in-multiprocessing-pool
 
 from multiprocessing.pool import Pool

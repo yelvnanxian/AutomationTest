@@ -1,6 +1,5 @@
 """作用：提供network相关的通用工具能力。"""
 
-# @Time    : 2020/1/19 14:46
 import socket
 
 class Network:

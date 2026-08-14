@@ -1,10 +1,5 @@
 """作用：定义user相关的持久化模型。"""
 
-#
-# user.py
-# @description
-# @created 2022-07-25T19:51:16.167Z+08:00
-# @last-modified 2022-07-25T19:56:52.705Z+08:00
 
 
 from sqlalchemy import Column, Integer, Text

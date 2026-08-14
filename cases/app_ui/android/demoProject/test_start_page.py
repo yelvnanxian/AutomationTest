@@ -1,9 +1,8 @@
 # -*- coding:utf8 -*-
 """作用：定义start page相关的自动化测试用例。"""
 
-# 创建时间 2018/01/19 22:36
-from base.app_ui.android.demoProject.app_ui_android_demoProject_client import APP_UI_Android_demoProject_Client
-from page_objects.app_ui.android.demoProject.pages.startPage import StartPage
+from base.app_ui.android.demoProject.app_ui_android_demo_project_client import APP_UI_Android_demoProject_Client
+from page_objects.app_ui.android.demoProject.pages.start_page import StartPage
 import pytest
 class TestStartPage:
     def setup_class(self):

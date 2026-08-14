@@ -1,14 +1,8 @@
 """作用：提供robot相关的通用工具能力。"""
 
-#
-# robot.py
-# @description
-# @created 2021-04-13T11:35:22.550Z+08:00
-# @last-modified 2022-02-07T18:55:03.094Z+08:00
-#
 
-from common.dateTimeTool import DateTimeTool
-from common.httpclient.doRequest import DoRequest
+from common.datetime_tool import DateTimeTool
+from common.http_client.request_client import DoRequest
 import hmac
 import hashlib
 import base64

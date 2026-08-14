@@ -1,10 +1,5 @@
 """作用：封装aliyun mns client客户端的连接和访问能力。"""
 
-#
-# aliyun_mns_client.py
-# @description
-# @created 2022-05-11T15:21:50.951Z+08:00
-# @last-modified 2022-05-11T20:12:06.029Z+08:00
 # Python SDK Version 1.1.6
 from .mns.account import Account
 from .mns.mns_common import TopicHelper

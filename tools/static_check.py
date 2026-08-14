@@ -2,6 +2,7 @@
 """作用：提供static check模块相关功能。"""
 
 import ast
+import subprocess
 import sys
 from pathlib import Path
 
@@ -9,17 +10,33 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EXCLUDED_DIRS = {'.git', '.venv', '.appium', 'node_modules'}
 REPORT_SCRIPTS = (
-    ROOT / 'generate_api_test_report.py',
-    ROOT / 'generate_web_ui_test_report.py',
-    ROOT / 'generate_app_ui_test_report.py',
+    ROOT / 'scripts' / 'reports' / 'generate_api_test_report.py',
+    ROOT / 'scripts' / 'reports' / 'generate_web_ui_test_report.py',
+    ROOT / 'scripts' / 'reports' / 'generate_app_ui_test_report.py',
     ROOT / 'common' / 'allure_report.py',
 )
 REQUIRED_PATHS = (
-    ROOT / 'config' / 'demoProject' / 'api_demoProject_release.conf',
-    ROOT / 'generate_api_test_report.py',
-    ROOT / 'generate_web_ui_test_report.py',
-    ROOT / 'generate_app_ui_test_report.py',
+    ROOT / 'config' / 'pytest.ini',
+    ROOT / 'config' / 'demoProject' / 'api_demo_project_release.conf',
+    ROOT / 'scripts' / 'runners' / 'run_api_test.py',
+    ROOT / 'scripts' / 'runners' / 'run_web_ui_test.py',
+    ROOT / 'scripts' / 'runners' / 'run_app_ui_test.py',
+    ROOT / 'scripts' / 'reports' / 'generate_api_test_report.py',
+    ROOT / 'scripts' / 'reports' / 'generate_web_ui_test_report.py',
+    ROOT / 'scripts' / 'reports' / 'generate_app_ui_test_report.py',
+    ROOT / 'scripts' / 'services' / 'start_selenium.sh',
+    ROOT / 'scripts' / 'test_env.sh',
+    ROOT / 'requirements' / 'web.txt',
+    ROOT / 'requirements' / 'mobile.txt',
+    ROOT / 'requirements' / 'performance.txt',
 )
+ALLOWED_ROOT_FILES = {
+    '.gitignore',
+    'README.md',
+    'package-lock.json',
+    'package.json',
+    'requirements.txt',
+}
 
 
 def check_python_syntax(errors):
@@ -54,11 +71,32 @@ def check_required_paths(errors):
             errors.append('缺少必要文件:%s' % path.relative_to(ROOT))
 
 
+def check_python_file_names(errors):
+    for path in ROOT.rglob('*.py'):
+        if EXCLUDED_DIRS.intersection(path.relative_to(ROOT).parts):
+            continue
+        if path.name != path.name.lower():
+            errors.append('%s Python文件名应使用snake_case小写格式' % path.relative_to(ROOT))
+
+
+def check_root_layout(errors):
+    output = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True)
+    tracked_root_files = {
+        path for path in output.splitlines()
+        if path and '/' not in path
+    }
+    unexpected_files = sorted(tracked_root_files - ALLOWED_ROOT_FILES)
+    for path in unexpected_files:
+        errors.append('%s 应移动到职责明确的子目录' % path)
+
+
 def main():
     errors = []
     python_file_count = check_python_syntax(errors)
     check_report_shell_usage(errors)
     check_required_paths(errors)
+    check_python_file_names(errors)
+    check_root_layout(errors)
     if errors:
         for error in errors:
             print(error, file=sys.stderr)

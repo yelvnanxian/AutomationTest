@@ -1,9 +1,8 @@
 # -*- coding:utf8 -*-
 """作用：定义index page相关的自动化测试用例。"""
 
-# 创建时间 2018/01/19 22:36
-from base.app_ui.android.demoProject.app_ui_android_demoProject_client import APP_UI_Android_demoProject_Client
-from page_objects.app_ui.android.demoProject.pages.startPage import StartPage
+from base.app_ui.android.demoProject.app_ui_android_demo_project_client import APP_UI_Android_demoProject_Client
+from page_objects.app_ui.android.demoProject.pages.start_page import StartPage
 import pytest
 import time
 
@@ -22,17 +21,17 @@ class TestIndexPage:
         self.appOperator.stop_recording_screen()
 
     @pytest.fixture
-    def fixture_test_silde(self):
+    def fixture_test_slide(self):
         print('start......')
-        yield self.fixture_test_silde
+        yield self.fixture_test_slide
         print('end......')
 
-    def test_silde(self,fixture_test_silde):
+    def test_slide(self,fixture_test_slide):
         time.sleep(10)
-        self.indexPage.index_left_silde()
-        self.indexPage.index_right_silde()
-        self.indexPage.index_up_silde()
-        self.indexPage.index_down_silde()
+        self.indexPage.index_left_slide()
+        self.indexPage.index_right_slide()
+        self.indexPage.index_up_slide()
+        self.indexPage.index_down_slide()
 
     def teardown_class(self):
         self.appOperator.reset_app()

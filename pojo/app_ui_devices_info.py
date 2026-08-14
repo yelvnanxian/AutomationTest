@@ -1,6 +1,5 @@
 """作用：定义或承载app ui devices info相关的数据结构。"""
 
-# 创建时间 2019/12/26 9:17
 from base.read_httpserver_config import Read_Http_Server_Config
 import os
 

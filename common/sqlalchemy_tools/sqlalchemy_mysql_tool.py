@@ -1,10 +1,5 @@
 """作用：提供sqlalchemy mysql tool相关的通用工具能力。"""
 
-#
-# sqlalchemy_mysql_tool.py
-# @description
-# @created 2022-07-21T18:07:28.086Z+08:00
-# @last-modified 2022-07-25T19:58:02.887Z+08:00
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session

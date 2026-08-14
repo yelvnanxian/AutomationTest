@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 """作用：读取并解析web ui config所需的配置。"""
 
-# 创建时间 2018/01/19 22:36
 from pojo.web_ui_config import WEB_UI_Config
 import configparser as ConfigParser
 

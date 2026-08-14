@@ -1,10 +1,5 @@
 """作用：封装memcached client客户端的连接和访问能力。"""
 
-#
-# memcached_client.py
-# @description
-# @created 2021-10-18T15:05:34.469Z+08:00
-# @last-modified 2021-10-18T17:43:35.744Z+08:00
 import bmemcached
 
 class Memcached_Client:

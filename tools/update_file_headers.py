@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SUPPORTED_SUFFIXES = {'.py', '.sh', '.conf', '.md', '.txt', '.yml', '.yaml', '.xml', '.java'}
+SUPPORTED_SUFFIXES = {'.py', '.sh', '.conf', '.ini', '.md', '.txt', '.yml', '.yaml', '.xml', '.java'}
 SUPPORTED_NAMES = {'.gitignore'}
 EXCLUDED_PREFIXES = (
     'common/aliyun_mns/mns/',
@@ -20,6 +20,11 @@ AUTHOR_LINE = re.compile(
     r'copyright\s+(?:\(c\)\s*)?[^<]*).*?(?:-->)?\s*$'
 )
 CODING_LINE = re.compile(r'^\s*#.*coding[:=]\s*[-\w.]+')
+LEGACY_METADATA_LINE = re.compile(
+    r'^\s*#\s*(?:$|创建时间\b.*|@(?:Time|created|last-modified|description)\b.*|'
+    r'[A-Za-z_][\w.-]*\.py\s*)$',
+    re.IGNORECASE,
+)
 
 
 def tracked_text_files():
@@ -53,7 +58,7 @@ def purpose_for(path):
     if name == '__init__.py':
         package_name = relative.parent.as_posix().replace('/', '.') or '项目根'
         return '初始化%s包并定义其模块边界。' % package_name
-    if name.startswith('test_'):
+    if path.suffix == '.py' and name.startswith('test_'):
         return '定义%s相关的自动化测试用例。' % stem.replace('test ', '')
     if name.startswith('run_'):
         return '提供%s流程的命令行执行入口。' % stem.replace('run ', '')
@@ -81,7 +86,7 @@ def purpose_for(path):
         return '定义%s相关的持久化模型。' % stem
     if relative_text.startswith('common_projects/'):
         return '封装%s相关的项目公共业务能力。' % stem
-    if path.suffix == '.conf':
+    if path.suffix in {'.conf', '.ini'}:
         return '配置%s相关的运行参数。' % stem
     if path.suffix == '.sh':
         return '提供%s相关的Shell启动命令。' % stem
@@ -100,6 +105,13 @@ def purpose_for(path):
 
 def remove_author_lines(lines):
     return [line for line in lines if not AUTHOR_LINE.match(line)]
+
+
+def remove_legacy_header_metadata(lines):
+    return [
+        line for index, line in enumerate(lines)
+        if index >= 12 or not LEGACY_METADATA_LINE.match(line)
+    ]
 
 
 def insert_after_prefix(lines, prefix_count, comment_lines):
@@ -151,6 +163,7 @@ def update_file(path):
     original = path.read_text(encoding='utf-8-sig')
     had_trailing_newline = original.endswith('\n')
     lines = remove_author_lines(original.splitlines())
+    lines = remove_legacy_header_metadata(lines)
     purpose = purpose_for(path)
 
     if path.suffix == '.py':

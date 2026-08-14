@@ -1,9 +1,8 @@
 """作用：执行http server init相关的运行前初始化。"""
 
-# @Time    : 2020/1/19 14:33
 from base.read_httpserver_config import Read_Http_Server_Config
-from common.dateTimeTool import DateTimeTool
-from common.strTool import StrTool
+from common.datetime_tool import DateTimeTool
+from common.string_tool import StrTool
 import multiprocessing
 import platform
 import subprocess

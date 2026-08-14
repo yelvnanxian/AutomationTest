@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 """作用：定义saucedemo login相关的自动化测试用例。"""
 
-from base.web_ui.demoProject.web_ui_demoProject_client import WEB_UI_DemoProject_Client
-from page_objects.web_ui.demoProject.pages.loginPage import LoginPage
+from base.web_ui.demoProject.web_ui_demo_project_client import WEB_UI_DemoProject_Client
+from page_objects.web_ui.demoProject.pages.login_page import LoginPage
 
 
 class TestSauceDemoLogin:

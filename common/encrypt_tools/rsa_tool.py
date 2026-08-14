@@ -1,11 +1,5 @@
 """作用：提供rsa tool相关的通用工具能力。"""
 
-#
-# rsa_tool.py
-# @description
-# @created 2022-03-04T14:25:11.785Z+08:00
-# @last-modified 2022-03-04T17:08:23.332Z+08:00
-#
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 import base64

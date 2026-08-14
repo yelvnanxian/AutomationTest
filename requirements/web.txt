@@ -1,0 +1,11 @@
+# 作用：定义Python 3.12 Web自动化测试环境的核心依赖。
+
+selenium==4.47.0
+pytest==8.4.2
+pytest-xdist==3.8.0
+pytest-rerunfailures==16.5
+allure-pytest==2.16.0
+PyHamcrest==2.1.0
+requests==2.34.2
+Pillow==12.3.0
+ujson==5.11.0

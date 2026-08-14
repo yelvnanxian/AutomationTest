@@ -1,10 +1,6 @@
 """作用：封装gitlab client客户端的连接和访问能力。"""
 
-# gitlab_client.py
-# @description
-# @created 2021-04-25T15:04:47.417Z+08:00
-# @last-modified 2023-05-12T11:10:52.530Z+08:00
-from common.httpclient.doRequest import DoRequest
+from common.http_client.request_client import DoRequest
 from urllib.parse import urljoin
 import ujson
 
@@ -39,8 +35,8 @@ class GitlabClient:
         """
         project_id=self._get_project_id(project_name)
         params={'ref':ref}
-        httpResponsResult=self.doRequest.get('/projects/%s/repository/files/%s'%(project_id,file_path),params=params)
-        return ujson.loads(httpResponsResult.body)
+        http_response_result=self.doRequest.get('/projects/%s/repository/files/%s'%(project_id,file_path),params=params)
+        return ujson.loads(http_response_result.body)
 
     def update_project_file(self,project_name:str,branch_name:str,file_path:str,content:str,commit_message:str):
         """
@@ -53,5 +49,5 @@ class GitlabClient:
         """
         project_id=self._get_project_id(project_name)
         params={'branch':branch_name,'content':content,'commit_message':commit_message}
-        httpResponsResult=self.doRequest.put('/projects/%s/repository/files/%s'%(project_id,file_path),params=params)
-        return ujson.loads(httpResponsResult.body)
+        http_response_result=self.doRequest.put('/projects/%s/repository/files/%s'%(project_id,file_path),params=params)
+        return ujson.loads(http_response_result.body)

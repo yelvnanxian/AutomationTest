@@ -1,27 +1,25 @@
-"""作用：定义baidu index相关的性能测试任务。"""
+"""作用：定义百度首页的Locust性能测试用户和请求任务。"""
 
-# @Time    : 2020/1/6 9:37
-from locust import TaskSet,task,between
-from locust.contrib.fasthttp import FastHttpLocust
 import queue
 
-class UserAction(TaskSet):
-    def on_start(self):
-        pass
+from locust import FastHttpUser, between, task
+from locust.exception import StopUser
+
+
+class BaiduIndexUser(FastHttpUser):
+    """以每个工作进程100次请求为上限访问百度首页。"""
+
+    host = 'https://www.baidu.com'
+    wait_time = between(0, 0)
+    execution_count = 100
+    request_numbers = queue.Queue()
+    for request_number in range(execution_count):
+        request_numbers.put_nowait(request_number)
 
     @task(1)
     def index(self):
         try:
-            if self.locust.num_queue.get()!=0:
-                self.client.get('/')
+            self.request_numbers.get_nowait()
         except queue.Empty:
-            pass
-
-class User(FastHttpLocust):
-    wait_time=between(0,0)
-    task_set=UserAction
-    #控制每个从节点执行的次数
-    excute_num=100
-    num_queue=queue.Queue()
-    for i in range(excute_num+1):
-        num_queue.put_nowait(i)
+            raise StopUser()
+        self.client.get('/', name='/')

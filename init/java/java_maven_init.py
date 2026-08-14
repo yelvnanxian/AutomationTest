@@ -1,8 +1,7 @@
 """作用：执行java maven init相关的运行前初始化。"""
 
-# 创建时间 2018/01/19 22:36
-from common.dateTimeTool import DateTimeTool
-from common.fileTool import FileTool
+from common.datetime_tool import DateTimeTool
+from common.file_tool import FileTool
 import os
 import subprocess
 import platform

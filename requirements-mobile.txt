@@ -1,4 +1,0 @@
-# 作用：记录requirements-mobile相关的依赖或文本配置。
-
--r requirements-web.txt
-Appium-Python-Client==6.0.0

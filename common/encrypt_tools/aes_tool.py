@@ -1,10 +1,5 @@
 """作用：提供aes tool相关的通用工具能力。"""
 
-#
-# aes_tool.py
-# @description
-# @created 2021-09-06T18:28:10.458Z+08:00
-# @last-modified 2023-09-05T18:11:41.678Z+08:00
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad,unpad
 import base64

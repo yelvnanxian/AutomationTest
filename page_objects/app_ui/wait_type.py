@@ -1,6 +1,5 @@
 """作用：提供wait type模块相关功能。"""
 
-# 创建时间 2018/01/19 22:36
 class Wait_Type:
     TITLE_IS = 'title_is'
     TITLE_CONTAINS = 'title_contains'

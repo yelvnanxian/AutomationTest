@@ -1,0 +1,4 @@
+# 作用：在Web依赖基础上增加Appium移动端自动化客户端。
+
+-r web.txt
+Appium-Python-Client==6.0.0
