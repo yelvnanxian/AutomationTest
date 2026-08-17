@@ -32,7 +32,9 @@ def main():
         report_output_dir = report_dir / 'report' / ('app_ui_report_%s' % test_time)
         log_file = Path('logs') / ('generate_app_ui_test_report_%s_%s.log' % (index, test_time))
         print('%s生成报告%s,使用端口%s' % (DateTimeTool.getNowTime(), report_output_dir, port))
-        process_id = generate_and_open_report(report_data_dir, report_output_dir, port, log_file)
+        process_id = generate_and_open_report(
+            report_data_dir, report_output_dir, port, log_file, report_config.language
+        )
         print('%s报告地址:http://%s:%s/，进程id:%s' % (
             DateTimeTool.getNowTime(), Network.get_local_ip(), port, process_id
         ))

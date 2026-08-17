@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-"""作用：定义login page elements页面或界面的元素定位信息。"""
+"""作用：定义SauceDemo登录页面的元素定位信息。"""
 
 from page_objects.create_element import CreateElement
 from page_objects.web_ui.locator_type import Locator_Type

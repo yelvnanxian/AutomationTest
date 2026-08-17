@@ -1,5 +1,5 @@
 #-*- coding:utf8 -*-
-"""作用：定义index page elements页面或界面的元素定位信息。"""
+"""作用：定义示例项目首页的元素定位信息。"""
 
 from page_objects.create_element import CreateElement
 from page_objects.web_ui.wait_type import Wait_Type as Wait_By

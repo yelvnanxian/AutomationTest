@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 """作用：封装searchPage页面的用户操作和状态读取。"""
 
-from page_objects.web_ui.demoProject.elements.search_page_elements import SearchPageElements
+from page_objects.web_ui.demoProject.elements.page_search_elements import SearchPageElements
 class SearchPage:
     def __init__(self,browserOperator,title):
         self._browserOperator=browserOperator

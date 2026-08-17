@@ -23,7 +23,8 @@ def main():
 
     print('%s生成报告,使用端口%s' % (DateTimeTool.getNowTime(), port))
     process_id = generate_and_open_report(
-        'output/api/report_data', report_output_dir, port, log_file
+        'output/api/report_data', report_output_dir, port, log_file,
+        report_config.language,
     )
     print('%s报告地址:http://%s:%s/' % (DateTimeTool.getNowTime(), Network.get_local_ip(), port))
     print('%sAllure服务进程id:%s' % (DateTimeTool.getNowTime(), process_id))

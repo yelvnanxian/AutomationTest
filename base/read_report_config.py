@@ -21,6 +21,7 @@ class Read_Report_Config(object):
         configParser = ConfigParser.ConfigParser()
         configParser.read(configFile,encoding='utf-8')
         report_config = Report_Config()
+        report_config.language = configParser.get('web_ui', 'language', fallback='zh')
         report_config.api_port=configParser.get('api','api_port')
         report_config.app_ui_start_port=configParser.get('app_ui','app_ui_start_port')
         report_config.web_ui_ie_port = configParser.get('web_ui', 'web_ui_ie_port')

@@ -1,6 +1,7 @@
 """作用：提供allure report相关的通用工具能力。"""
 
 import os
+import re
 import socket
 import subprocess
 from pathlib import Path
@@ -27,7 +28,7 @@ def ensure_port_available(port):
             raise RuntimeError('端口%s已被占用，请指定其他端口' % port) from exc
 
 
-def generate_and_open_report(report_data_dir, report_output_dir, port, log_file):
+def generate_and_open_report(report_data_dir, report_output_dir, port, log_file, language='zh'):
     """Generate and serve an Allure report without invoking a shell."""
     port = validate_port(port)
     ensure_port_available(port)
@@ -44,6 +45,18 @@ def generate_and_open_report(report_data_dir, report_output_dir, port, log_file)
         ['allure', 'generate', str(report_data_path), '-o', str(report_output_path)],
         check=True,
     )
+
+    # Allure根据HTML的lang属性初始化界面语言，生成后设置为配置中的默认语言。
+    index_path = report_output_path / 'index.html'
+    if index_path.is_file() and language:
+        index_html = index_path.read_text(encoding='utf-8')
+        index_html = re.sub(
+            r'(<html\b[^>]*\blang=")[^"]*(")',
+            r'\g<1>%s\2' % language,
+            index_html,
+            count=1,
+        )
+        index_path.write_text(index_html, encoding='utf-8')
 
     creationflags = 0
     popen_kwargs = {'start_new_session': True}

@@ -15,6 +15,7 @@ AutomationTest 是一个基于 Python 和 pytest 的自动化测试框架，覆�
 
 ```text
 AutomationTest/
+├── api_objects/          API端点常量和业务服务对象
 ├── base/                 基础客户端和配置读取层
 ├── cases/                pytest 测试用例
 ├── common/               通用客户端与工具模块
@@ -131,8 +132,8 @@ SELENIUM_PORT=5555 ./scripts/services/start_selenium.sh
 相关文件：
 
 - `cases/web_ui/demoProject/test_saucedemo_login.py`
-- `page_objects/web_ui/demoProject/elements/login_page_elements.py`
-- `page_objects/web_ui/demoProject/pages/login_page.py`
+- `page_objects/web_ui/demoProject/elements/page_login_elements.py`
+- `page_objects/web_ui/demoProject/pages/page_login.py`
 - `config/demoProject/web_ui_demo_project.conf`
 
 ### 使用 Web UI 运行入口
@@ -149,6 +150,10 @@ SELENIUM_PORT=5555 ./scripts/services/start_selenium.sh
 ```bash
 ./scripts/test_env.sh python -m scripts.runners.run_api_test --help
 ./scripts/test_env.sh python -m scripts.runners.run_api_test -e test
+./scripts/test_env.sh python -m scripts.runners.run_api_test \
+  -e test \
+  -d cases/api/demoProject \
+  -k search
 ```
 
 ### App UI 测试
@@ -178,16 +183,149 @@ SELENIUM_PORT=5555 ./scripts/services/start_selenium.sh
 
 ## Allure 报告
 
+### 统一测试入口
+
+统一入口支持选择demo、测试用例以及是否生成报告。默认执行全部SauceDemo用例，并使用9527端口生成中文报告：
+
+```bash
+./scripts/runners/run_test_suite.sh
+```
+
+报告地址：<http://127.0.0.1:9527/>
+
+查看所有参数：
+
+```bash
+./scripts/runners/run_test_suite.sh --help
+```
+
+选择demo：
+
+```bash
+./scripts/runners/run_test_suite.sh --demo saucedemo
+./scripts/runners/run_test_suite.sh --demo demoproject
+./scripts/runners/run_test_suite.sh --demo web_ui
+./scripts/runners/run_test_suite.sh --demo web_ui/demoProject
+```
+
+`--demo` 可以传别名，也可以传 `cases` 下的相对目录。新增demo时，只需创建 `cases/web_ui/<new_demo>/`，再使用 `--demo web_ui/<new_demo>`，不需要修改运行框架。
+
+`--demo saucedemo`、`--demo web_ui/demoProject` 和 `--demo web_ui` 都会按照pytest默认规则收集 `test_*.py`，不会单独排除故意失败用例。
+
+选择测试功能或关键字，多个值用逗号分隔：
+
+```bash
+./scripts/runners/run_test_suite.sh --demo saucedemo --tests login,checkout
+./scripts/runners/run_test_suite.sh --demo saucedemo --tests test_logout_returns_to_login_page
+```
+
+当前SauceDemo全部用例的预期结果为14条通过、3条故意失败；命令返回状态码1是预期现象，但报告仍会生成。
+
+如需排除故意失败用例，可明确选择正常功能文件：
+
+```bash
+./scripts/runners/run_test_suite.sh \
+  --demo saucedemo \
+  --tests cart,checkout,inventory,login,navigation
+```
+
+只执行测试，不生成报告：
+
+```bash
+./scripts/runners/run_test_suite.sh --demo saucedemo --tests inventory --no-report
+```
+
+保留已有Allure原始数据，不清理后再执行：
+
+```bash
+./scripts/runners/run_test_suite.sh --demo saucedemo --keep-report-data
+```
+
+旧的SauceDemo命令仍可使用，但内部已转发到统一入口：
+
+```bash
+./scripts/reports/run_saucedemo_report.sh
+```
+
+单独清理原始数据或历史HTML报告：
+
+```bash
+./scripts/reports/clean_web_ui_report_data.sh
+./scripts/reports/clean_web_ui_report_data.sh --all
+```
+
+### 其他测试类型报告
+
 ```bash
 ./scripts/test_env.sh python -m scripts.reports.generate_api_test_report -p 9080
 ./scripts/test_env.sh python -m scripts.reports.generate_web_ui_test_report \
-  --chrome_port 9082 \
-  --firefox_port 9083
+  --chrome_port 9527
 ./scripts/test_env.sh python -m scripts.reports.generate_app_ui_test_report \
   --start_port 9084
 ```
 
 报告命令会读取 `config/report.conf`，并将生成日志写入 `logs/`。
+
+### Web UI扩展规范
+
+新增页面时，只需按页面对象模型新增文件：
+
+```text
+page_objects/web_ui/<demo>/elements/page_<page>_elements.py
+page_objects/web_ui/<demo>/pages/page_<page>.py
+cases/web_ui/<demo>/test_<demo>_<feature>.py
+test_data/web_ui/<demo>/<feature>_test_data.py
+```
+
+页面元素定位放在 `elements`，页面操作封装放在 `pages`，测试数据放在 `test_data`，测试用例只负责组合业务步骤和断言。新增测试文件使用 `test_*.py` 命名后，统一入口会自动收集，无需修改框架代码。
+
+例如新增用户资料页面：
+
+```text
+page_objects/web_ui/demoProject/elements/page_profile_elements.py
+page_objects/web_ui/demoProject/pages/page_profile.py
+test_data/web_ui/demoProject/profile_test_data.py
+cases/web_ui/demoProject/test_saucedemo_profile.py
+```
+
+### API扩展规范
+
+API测试采用与页面对象相同的分层思路：
+
+```text
+api_objects/<demo>/endpoints/endpoint_<module>.py
+api_objects/<demo>/services/service_<module>.py
+test_data/api/<demo>/<module>_test_data.py
+cases/api/<demo>/conftest.py
+cases/api/<demo>/api/test_<demo>_<module>.py
+cases/api/<demo>/scenarios/test_<demo>_<scenario>.py
+```
+
+- `endpoints`：只维护接口路径、必要的HTTP方法等不变定义。
+- `services`：封装单接口请求以及同一业务模块的复用调用。
+- `test_data`：维护请求输入、账号数据和预期结果；敏感数据通过环境变量读取。
+- `conftest.py`：统一提供客户端、鉴权和服务fixture。
+- `api`：验证单接口参数、状态码、响应结构和异常分支。
+- `scenarios`：组合登录、创建、查询、删除等跨接口业务流程。
+
+新增接口模块后，pytest会自动收集 `test_*.py`，不需要修改公共客户端或测试运行器。例如：
+
+```bash
+./scripts/test_env.sh python -m scripts.runners.run_api_test \
+  -e test \
+  -d cases/api/<demo> \
+  -k <module>
+```
+
+### 进一步优化方向
+
+- 在 `page_objects/**/components/` 中封装导航栏、弹窗、表格等跨页面组件。
+- 在 `workflows/` 中封装跨页面或跨接口流程，避免测试用例重复业务步骤。
+- 使用 `pytest.mark.parametrize` 维护等价类、边界值和异常数据，减少重复用例代码。
+- 通过环境变量和本地忽略配置管理账号、密码和Token，仓库只保存数据结构与演示值。
+- 在失败钩子中自动保存截图、页面源码、请求与响应，并作为Allure附件输出。
+- 将环境配置对象从全局单例逐步改为fixture注入，便于并行执行多个环境且避免配置缓存串用。
+- 为页面对象、服务对象和测试数据增加类型标注，并在提交前增加lint和类型检查。
 
 ## 配置说明
 
@@ -205,7 +343,8 @@ SELENIUM_PORT=5555 ./scripts/services/start_selenium.sh
 - Python 类使用 `PascalCase`。
 - 测试文件使用 `test_<project>_<feature>.py`。
 - 测试类以 `Test` 开头，测试方法以 `test_` 开头。
-- 页面元素放在 `page_objects/**/elements/`，页面操作放在 `page_objects/**/pages/`。
+- 页面元素使用 `page_<page>_elements.py`，页面操作使用 `page_<page>.py`。
+- API端点使用 `endpoint_<module>.py`，API服务使用 `service_<module>.py`。
 - 测试入口、报告入口、服务脚本不要放在项目根目录。
 - 文件顶部保留一条准确描述用途的模块注释，不维护手写创建时间或最后修改时间。
 - 密钥、Token、密码和真实服务器地址通过环境变量或本地忽略配置提供。

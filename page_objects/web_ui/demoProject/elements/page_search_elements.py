@@ -1,5 +1,5 @@
 #-*- coding:utf8 -*-
-"""作用：定义search page elements页面或界面的元素定位信息。"""
+"""作用：定义示例项目搜索结果页面的元素定位信息。"""
 
 from page_objects.web_ui.locator_type import Locator_Type
 from page_objects.create_element import CreateElement

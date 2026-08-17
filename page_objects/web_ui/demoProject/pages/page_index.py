@@ -1,8 +1,8 @@
 #-*- coding:utf-8 -*-
 """作用：封装indexPage页面的用户操作和状态读取。"""
 
-from page_objects.web_ui.demoProject.elements.index_page_elements import IndexPageElements
-from page_objects.web_ui.demoProject.pages.search_page import SearchPage
+from page_objects.web_ui.demoProject.elements.page_index_elements import IndexPageElements
+from page_objects.web_ui.demoProject.pages.page_search import SearchPage
 class IndexPage:
     def __init__(self,browserOperator):
         self._browserOperator=browserOperator

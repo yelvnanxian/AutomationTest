@@ -38,7 +38,9 @@ def main():
         report_output_dir = Path('output/web_ui') / browser / 'report' / ('web_ui_report_%s' % test_time)
         log_file = Path('logs') / ('generate_web_ui_test_%s_report_%s.log' % (browser, test_time))
         print('%s生成%s报告,使用端口%s' % (DateTimeTool.getNowTime(), browser, port))
-        process_id = generate_and_open_report(report_data_dir, report_output_dir, port, log_file)
+        process_id = generate_and_open_report(
+            report_data_dir, report_output_dir, port, log_file, report_config.language
+        )
         print('%s%s报告地址:http://%s:%s/，进程id:%s' % (
             DateTimeTool.getNowTime(), browser, Network.get_local_ip(), port, process_id
         ))

@@ -53,6 +53,12 @@ class BrowserOperator:
         if webElement:
             webElement.click()
 
+    def click_by_javascript(self, element, highlight_seconds=5):
+        """使用JavaScript触发点击，适用于动画菜单等原生点击不稳定的元素。"""
+        webElement = self._change_element_to_webElement_type(element, highlight_seconds)
+        if webElement:
+            self._driver.execute_script("arguments[0].click();", webElement)
+
     def submit(self,element,highlight_seconds=5):
         webElement = self._change_element_to_webElement_type(element,highlight_seconds)
         if webElement:
@@ -75,6 +81,14 @@ class BrowserOperator:
         if webElement:
             flag=webElement.is_displayed()
             return flag
+
+    def is_present(self, element):
+        """判断元素是否存在，不等待元素出现，适用于校验元素被移除。"""
+        if isinstance(element, ElementInfo):
+            return bool(self._driver.find_elements(element.locator_type, element.locator_value))
+        if isinstance(element, WebElement):
+            return True
+        return False
 
     def is_enabled(self,element,highlight_seconds=5):
         webElement = self._change_element_to_webElement_type(element,highlight_seconds)

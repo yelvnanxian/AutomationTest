@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
-"""作用：封装loginPage页面的用户操作和状态读取。"""
+"""作用：封装SauceDemo登录页面的用户操作和状态读取。"""
 
-from page_objects.web_ui.demoProject.elements.login_page_elements import LoginPageElements
+from page_objects.web_ui.demoProject.elements.page_login_elements import LoginPageElements
 
 
 class LoginPage:
