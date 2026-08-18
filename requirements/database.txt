@@ -1,0 +1,4 @@
+# 作用：定义MySQL数据库校验和SQLAlchemy ORM测试的可选依赖。
+
+PyMySQL==1.2.0
+SQLAlchemy==2.0.52

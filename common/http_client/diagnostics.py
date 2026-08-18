@@ -11,12 +11,17 @@ _SENSITIVE_HEADERS = {
     'proxy-authorization',
     'set-cookie',
     'x-api-key',
+    'x-access-key',
+    'client-secret',
 }
 _SENSITIVE_VALUE_PATTERN = re.compile(
-    r'(?i)(password|passwd|token|secret|authorization)(["\s:=]+)([^&\s",}]+)'
+    r'(?i)(password|passwd|token|secret|authorization|api[_-]?key|'
+    r'access[_-]?key|client[_-]?secret|email|phone|mobile|id[_-]?card)'
+    r'(["\s:=]+)([^&\s",}]+)'
 )
 _SENSITIVE_QUERY_PATTERN = re.compile(
-    r'(?i)([?&](?:password|passwd|token|secret|api_key|access_key)=)[^&#]*'
+    r'(?i)([?&](?:password|passwd|token|secret|api_key|access_key|'
+    r'client_secret|email|phone|mobile|id_card)=)[^&#]*'
 )
 _BASIC_AUTH_PATH_PATTERN = re.compile(r'(/basic-auth/[^/]+/)[^/?#]+')
 _MAX_BODY_LENGTH = 20000

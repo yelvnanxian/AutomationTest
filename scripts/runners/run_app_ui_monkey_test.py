@@ -18,7 +18,7 @@ if __name__=='__main__':
     # 处理pytest文件
 
     # 执行pytest前的参数准备
-    pytest_execute_params=['-c', 'config/pytest.ini', '-v', '--alluredir', 'output/app_ui_monkey/report_data/']
+    pytest_execute_params=['-c', 'config/pytest.ini', '--rootdir=.', '-v', '--alluredir', 'output/app_ui_monkey/report_data/']
     # 判断目录参数
     dir = 'cases/app_ui_monkey/'
     if args.dir:

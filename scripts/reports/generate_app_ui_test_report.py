@@ -16,7 +16,8 @@ def main():
     parser.add_argument('-sp', '--start_port', help='生成报告使用的开始端口，多份报告每次加1', type=int)
     args = parser.parse_args()
 
-    configured_port = Read_Report_Config().report_config.app_ui_start_port
+    report_config = Read_Report_Config().report_config
+    configured_port = report_config.app_ui_start_port
     start_port = validate_port(args.start_port if args.start_port is not None else configured_port)
     report_data_dirs = sorted(Path('output/app_ui').glob('*/*/report_data'))
     if not report_data_dirs:
@@ -30,10 +31,16 @@ def main():
         port = start_port + index
         report_dir = report_data_dir.parent
         report_output_dir = report_dir / 'report' / ('app_ui_report_%s' % test_time)
-        log_file = Path('logs') / ('generate_app_ui_test_report_%s_%s.log' % (index, test_time))
+        log_file = Path('logs') / ('allure_app_ui_%s_%s.log' % (index, port))
         print('%s生成报告%s,使用端口%s' % (DateTimeTool.getNowTime(), report_output_dir, port))
         process_id = generate_and_open_report(
-            report_data_dir, report_output_dir, port, log_file, report_config.language
+            report_data_dir,
+            report_output_dir,
+            port,
+            log_file,
+            report_config.language,
+            report_config.history_keep_count,
+            'app_ui_report_',
         )
         print('%s报告地址:http://%s:%s/，进程id:%s' % (
             DateTimeTool.getNowTime(), Network.get_local_ip(), port, process_id

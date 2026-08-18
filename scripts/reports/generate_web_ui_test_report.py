@@ -36,10 +36,16 @@ def main():
             continue
         port = validate_port(requested_port if requested_port is not None else configured_port)
         report_output_dir = Path('output/web_ui') / browser / 'report' / ('web_ui_report_%s' % test_time)
-        log_file = Path('logs') / ('generate_web_ui_test_%s_report_%s.log' % (browser, test_time))
+        log_file = Path('logs') / ('allure_web_ui_%s_%s.log' % (browser, port))
         print('%s生成%s报告,使用端口%s' % (DateTimeTool.getNowTime(), browser, port))
         process_id = generate_and_open_report(
-            report_data_dir, report_output_dir, port, log_file, report_config.language
+            report_data_dir,
+            report_output_dir,
+            port,
+            log_file,
+            report_config.language,
+            report_config.history_keep_count,
+            'web_ui_report_',
         )
         print('%s%s报告地址:http://%s:%s/，进程id:%s' % (
             DateTimeTool.getNowTime(), browser, Network.get_local_ip(), port, process_id

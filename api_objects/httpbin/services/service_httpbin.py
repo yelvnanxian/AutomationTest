@@ -23,13 +23,8 @@ class HttpbinService:
         return self._request.get(path)
 
     def get_headers(self, headers):
-        """发送自定义请求头并在请求结束后恢复客户端状态。"""
-        self._request.updateHeaders(headers)
-        try:
-            return self._request.get(HttpbinEndpoints.HEADERS)
-        finally:
-            for header_name in headers:
-                self._request.removeHeader(header_name)
+        """通过单次请求Header发送数据，不修改客户端默认状态。"""
+        return self._request.get(HttpbinEndpoints.HEADERS, headers=headers)
 
     def basic_auth(self, username, password):
         """使用HTTP Basic Auth请求认证接口。"""

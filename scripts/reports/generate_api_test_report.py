@@ -20,12 +20,14 @@ def main():
     port = validate_port(args.port if args.port is not None else configured_port)
     test_time = DateTimeTool.getNowTime('%Y_%m_%d_%H_%M_%S_%f')
     report_output_dir = 'output/api/report/api_report_%s' % test_time
-    log_file = 'logs/generate_api_test_report_%s.log' % test_time
+    log_file = 'logs/allure_api_%s.log' % port
 
     print('%s生成报告,使用端口%s' % (DateTimeTool.getNowTime(), port))
     process_id = generate_and_open_report(
         'output/api/report_data', report_output_dir, port, log_file,
         report_config.language,
+        report_config.history_keep_count,
+        'api_report_',
     )
     print('%s报告地址:http://%s:%s/' % (DateTimeTool.getNowTime(), Network.get_local_ip(), port))
     print('%sAllure服务进程id:%s' % (DateTimeTool.getNowTime(), process_id))

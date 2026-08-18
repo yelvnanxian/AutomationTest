@@ -4,6 +4,7 @@
 class Report_Config:
     def __init__(self):
         self.language = 'zh'
+        self.history_keep_count = 0
         self.api_port = None
         self.app_ui_start_port = None
         self.web_ui_ie_port = None

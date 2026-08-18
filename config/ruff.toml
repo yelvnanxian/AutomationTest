@@ -1,0 +1,13 @@
+# 作用：配置Ruff优先检查会直接导致运行失败的高风险Python错误。
+
+target-version = "py312"
+exclude = [
+    ".git",
+    ".venv",
+    ".appium",
+    "node_modules",
+    "output",
+]
+
+[lint]
+select = ["E9", "F63", "F7", "F82"]

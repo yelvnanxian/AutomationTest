@@ -2,6 +2,7 @@
 """作用：提供static check模块相关功能。"""
 
 import ast
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
@@ -29,6 +30,9 @@ REQUIRED_PATHS = (
     ROOT / 'requirements' / 'web.txt',
     ROOT / 'requirements' / 'mobile.txt',
     ROOT / 'requirements' / 'performance.txt',
+    ROOT / 'requirements' / 'database.txt',
+    ROOT / 'requirements' / 'dev.txt',
+    ROOT / 'config' / 'ruff.toml',
 )
 ALLOWED_ROOT_FILES = {
     '.gitignore',
@@ -90,6 +94,30 @@ def check_root_layout(errors):
         errors.append('%s 应移动到职责明确的子目录' % path)
 
 
+def check_ruff(errors):
+    """使用Ruff检查会直接导致运行失败的高风险Python错误。"""
+    if importlib.util.find_spec('ruff') is None:
+        return False
+    result = subprocess.run(
+        [
+            sys.executable,
+            '-m',
+            'ruff',
+            'check',
+            '--config',
+            'config/ruff.toml',
+            '.',
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        errors.append('Ruff高风险规则检查失败:\n%s' % result.stdout.strip())
+    return True
+
+
 def main():
     errors = []
     python_file_count = check_python_syntax(errors)
@@ -97,11 +125,13 @@ def main():
     check_required_paths(errors)
     check_python_file_names(errors)
     check_root_layout(errors)
+    ruff_enabled = check_ruff(errors)
     if errors:
         for error in errors:
             print(error, file=sys.stderr)
         return 1
-    print('静态检查通过：%s个Python文件' % python_file_count)
+    ruff_status = '已执行Ruff高风险规则' if ruff_enabled else '未安装Ruff，已跳过Ruff规则'
+    print('静态检查通过：%s个Python文件，%s' % (python_file_count, ruff_status))
     return 0
 
 

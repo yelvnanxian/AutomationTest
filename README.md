@@ -69,6 +69,12 @@ python3.12 -m venv .venv
 
 `requirements.txt` 默认引用 `requirements/web.txt`。
 
+需要修改框架代码、执行Ruff静态检查或生成覆盖率时，使用开发依赖：
+
+```bash
+.venv/bin/python -m pip install -r requirements/dev.txt
+```
+
 ### Appium 移动端测试
 
 ```bash
@@ -88,6 +94,16 @@ Appium 驱动按实际平台安装，例如：
 ```bash
 .venv/bin/python -m pip install -r requirements/performance.txt
 ```
+
+### MySQL 数据库测试
+
+需要执行MySQL数据校验或SQLAlchemy ORM测试时，再安装可选数据库依赖：
+
+```bash
+.venv/bin/python -m pip install -r requirements/database.txt
+```
+
+数据库地址、账号和密码应通过环境变量或本地忽略配置传入，不得提交到Git。SQL语句应使用参数化占位符，不要拼接账号、订单号等测试数据。
 
 ## 环境命令包装器
 
@@ -236,6 +252,27 @@ HTTPBIN_BASE_URL=https://httpbingo.org \
 
 ## Allure 报告
 
+### 测试日志
+
+pytest测试日志统一写入项目根目录的 `logs/`：
+
+```text
+logs/test.log                         串行测试日志
+logs/test_gw0.log                    xdist第0个worker日志
+logs/test_gw1.log                    xdist第1个worker日志
+logs/allure_api_<port>.log           API报告服务日志
+logs/allure_web_ui_<browser>_<port>.log  Web UI报告服务日志
+logs/allure_app_ui_<index>_<port>.log    App UI报告服务日志
+```
+
+测试日志包含测试会话、用例开始、用例结果和耗时。测试用例只有在主动输出 `logging.info()`、`logging.warning()` 或 `logging.error()` 时，才会出现业务步骤日志。密码、Token、Cookie等敏感信息不得写入日志。
+
+报告服务日志不再使用时间戳创建新文件。同一测试类型、浏览器或设备编号以及端口再次生成报告时，会覆盖对应的旧服务日志。Allure服务PID记录在 `output/runtime/allure/`，再次使用同一端口时只停止项目自己记录且命令校验通过的Allure进程，不会按端口直接终止其他Java进程。
+
+HTML报告目录仍使用时间戳保存历史。`config/report.conf` 中的 `history_keep_count` 默认值为0，不会自动删除历史报告；需要限制磁盘占用时可改为10等正整数。清理时只处理名称前缀匹配的旧报告，并保护本次刚生成的目录。
+
+日志是本地诊断产物，不是测试结果存储；测试结果和失败附件应查看 `output/` 下的Allure数据和报告。日志文件已加入忽略规则，不应提交到GitHub。
+
 ### 统一测试入口
 
 统一入口支持选择demo、测试用例以及是否生成报告。默认执行全部SauceDemo用例，并使用9527端口生成中文报告：
@@ -259,13 +296,16 @@ HTTPBIN_BASE_URL=https://httpbingo.org \
 ./scripts/runners/run_test_suite.sh --demo httpbin
 ./scripts/runners/run_test_suite.sh --demo demoproject
 ./scripts/runners/run_test_suite.sh --demo web_ui
+./scripts/runners/run_test_suite.sh --demo api
+./scripts/runners/run_test_suite.sh --demo unit --no-report
+./scripts/runners/run_test_suite.sh --demo app_ui --no-report
 ./scripts/runners/run_test_suite.sh --demo web_ui/demoProject
 ./scripts/runners/run_test_suite.sh --demo api/httpbin
 ```
 
 `--demo` 可以传别名，也可以传 `cases` 下的相对目录。新增demo时，只需创建 `cases/web_ui/<new_demo>/` 或 `cases/api/<new_demo>/`，再传对应相对目录，不需要修改运行框架。
 
-Web UI报告默认使用9527端口，API报告默认使用9080端口。执行httpbin并生成API报告：
+报告端口统一读取 `config/report.conf`，当前Web UI Chrome为9527、API为2001；命令行 `--port` 只用于本次临时覆盖。执行httpbin并生成API报告：
 
 ```bash
 ./scripts/runners/run_test_suite.sh --demo httpbin
@@ -297,10 +337,11 @@ HTTPBIN_BASE_URL=https://httpbingo.org \
   --tests cart,checkout,inventory,login,navigation
 ```
 
-只执行测试，不生成报告：
+只执行测试，不清理或生成Allure数据和HTML报告。`unit`、`app_ui` 等暂未配置统一报告生成器的测试类型也可以用这种方式运行：
 
 ```bash
 ./scripts/runners/run_test_suite.sh --demo saucedemo --tests inventory --no-report
+./scripts/runners/run_test_suite.sh --demo unit --no-report
 ```
 
 保留已有Allure原始数据，不清理后再执行：
@@ -325,7 +366,7 @@ HTTPBIN_BASE_URL=https://httpbingo.org \
 ### 其他测试类型报告
 
 ```bash
-./scripts/test_env.sh python -m scripts.reports.generate_api_test_report -p 9080
+./scripts/test_env.sh python -m scripts.reports.generate_api_test_report
 ./scripts/test_env.sh python -m scripts.reports.generate_web_ui_test_report \
   --chrome_port 9527
 ./scripts/test_env.sh python -m scripts.reports.generate_app_ui_test_report \
@@ -375,6 +416,84 @@ cases/api/<demo>/scenarios/test_<demo>_<scenario>.py
 - `conftest.py`：统一提供客户端、鉴权和服务fixture。
 - `api`：验证单接口参数、状态码、响应结构和异常分支。
 - `scenarios`：组合登录、创建、查询、删除等跨接口业务流程。
+
+#### Token、Session、Cookie与接口关联
+
+登录态、角色和租户场景不要共享同一个session级客户端。使用 `APIClientFactory` 为每条用例或每个角色创建独立客户端：
+
+```python
+factory = APIClientFactory(config_path, base_url_env='MY_PROJECT_BASE_URL')
+admin_client = factory.create(auth_provider=admin_auth_provider)
+user_client = factory.create(auth_provider=user_auth_provider)
+```
+
+认证信息通过Provider组合，Token过期时在请求发送前刷新，不会在401后自动重放创建、支付等非幂等请求：
+
+```python
+auth_provider = CompositeAuthProvider(
+    BearerTokenProvider(
+        access_token,
+        refresh_token=refresh_token,
+        expires_in=expires_in,
+        refresh_callback=auth_service.refresh,
+    ),
+    CookieAuthProvider({'session': session_cookie}),
+    CsrfTokenProvider(csrf_token),
+)
+client.request.set_auth_provider(auth_provider)
+```
+
+跨接口动态值保存到function级 `api_context`，不使用模块全局变量，也不让用例依赖执行顺序：
+
+```python
+order_id = api_context.capture_json(create_response, 'data.id', 'order_id')
+request_id = api_context.capture_header(create_response, 'X-Request-ID')
+session_cookie = api_context.capture_cookie(login_response, 'session')
+
+query_response = order_service.get(api_context.get('order_id'))
+```
+
+创建资源后立即登记兜底清理。业务流程主动删除成功时取消对应动作；否则fixture会在用例结束后按反向顺序清理：
+
+```python
+cleanup_action = cleanup_registry.add(
+    order_service.delete,
+    order_id,
+    name='删除测试订单',
+)
+
+order_service.delete(order_id)
+cleanup_registry.cancel(cleanup_action)
+```
+
+数据库存在异步落库时使用 `poll_until`，不要固定 `sleep`。API字符串金额、数据库Decimal、日期时区和字段名差异应先标准化再比较：
+
+```python
+database_order = poll_until(
+    query=lambda: order_repository.get(order_id),
+    condition=lambda row: row and row['order_status'] == 'PAID',
+    timeout=10,
+    interval=0.5,
+    description='订单状态变为PAID',
+)
+
+assert_api_database_match(
+    api_order,
+    database_order,
+    field_mapping={'id': 'order_no', 'total_amount': 'amount'},
+    normalizers={'total_amount': normalize_decimal},
+)
+```
+
+完整的可执行关联示例位于 `cases/unit/examples/test_api_association_scenario.py`，包含登录、Token/Cookie/CSRF注入、业务ID提取、数据库轮询、字段比较及资源清理。
+
+断言与校验模块按职责使用：
+
+| 模块 | 适用范围 |
+| --- | --- |
+| `common/http_client/response_assertions.py` | API状态码、响应时间、Header、JSON路径和Schema校验 |
+| `common/data_validation.py` | API与数据库字段映射、类型标准化、异步数据轮询 |
+| `common/assertion_tool.py` | 历史文件内容及正则断言；新API用例不建议继续扩展该模块 |
 
 新增接口模块后，pytest会自动收集 `test_*.py`，不需要修改公共客户端或测试运行器。例如：
 
@@ -605,4 +724,4 @@ MY_PROJECT_PASSWORD='从本地密钥或CI Secret读取' \
 git diff --check
 ```
 
-静态检查会验证 Python 语法、必要目录、报告脚本安全规则、根目录布局和 Python 文件命名。
+静态检查会验证 Python 语法、必要目录、报告脚本安全规则、根目录布局和 Python 文件命名。安装 `requirements/dev.txt` 后还会自动执行Ruff的高风险规则，优先发现未定义变量、无效语法和容易直接导致运行失败的错误；暂不强制一次性格式化全部历史代码。
