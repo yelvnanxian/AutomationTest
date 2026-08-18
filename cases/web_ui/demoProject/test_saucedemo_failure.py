@@ -1,10 +1,13 @@
 # -*- coding:utf-8 -*-
 """作用：提供一个需手动运行的SauceDemo失败报告演示用例。"""
 
+import pytest
+
 from page_objects.web_ui.demoProject.pages.page_cart import CartPage
 from page_objects.web_ui.demoProject.pages.page_inventory import InventoryPage
 
 
+@pytest.mark.failure_demo
 class TestSauceDemoFailureDemo:
     # 用例目的：演示断言不符合实际结果时，VS Code和Allure中的失败展示效果。
     def test_demo_expected_failure(self, logged_in_client):

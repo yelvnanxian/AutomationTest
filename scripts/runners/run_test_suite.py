@@ -12,12 +12,28 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CASES_ROOT = PROJECT_ROOT / 'cases'
-REPORT_DATA_DIR = PROJECT_ROOT / 'output' / 'web_ui' / 'chrome' / 'report_data'
 
 DEMO_ALIASES = {
     'saucedemo': Path('web_ui/demoProject'),
     'demoproject': Path('web_ui/demoProject'),
     'web_ui': Path('web_ui'),
+    'httpbin': Path('api/httpbin'),
+    'api': Path('api'),
+}
+
+REPORT_SPECS = {
+    'web_ui': {
+        'data_dir': PROJECT_ROOT / 'output' / 'web_ui' / 'chrome' / 'report_data',
+        'default_port': 9527,
+        'module': 'scripts.reports.generate_web_ui_test_report',
+        'port_arg': '--chrome_port',
+    },
+    'api': {
+        'data_dir': PROJECT_ROOT / 'output' / 'api' / 'report_data',
+        'default_port': 9080,
+        'module': 'scripts.reports.generate_api_test_report',
+        'port_arg': '--port',
+    },
 }
 
 
@@ -28,7 +44,7 @@ def parse_args():
     parser.add_argument(
         '--demo',
         default='saucedemo',
-        help='选择demo目录或别名，例如：saucedemo、web_ui/demoProject、web_ui。',
+        help='选择demo目录或别名，例如：saucedemo、httpbin、web_ui、api。',
     )
     parser.add_argument(
         '--tests',
@@ -43,8 +59,8 @@ def parse_args():
     parser.add_argument(
         '--port',
         type=int,
-        default=9527,
-        help='Allure Chrome报告端口，默认：9527。',
+        default=None,
+        help='Allure报告端口，默认Web UI为9527、API为9080。',
     )
     parser.add_argument(
         '--no-report',
@@ -100,11 +116,20 @@ def build_test_args(demo, tests):
     return test_args
 
 
-def clean_report_data():
-    if REPORT_DATA_DIR.exists():
-        shutil.rmtree(REPORT_DATA_DIR)
-    REPORT_DATA_DIR.mkdir(parents=True, exist_ok=True)
-    print('已清理Allure原始数据：%s' % REPORT_DATA_DIR)
+def resolve_test_type(demo_path):
+    """根据cases下的一级目录识别测试类型。"""
+    relative_path = demo_path.relative_to(CASES_ROOT)
+    test_type = relative_path.parts[0]
+    if test_type not in REPORT_SPECS:
+        raise ValueError('统一入口暂不支持%s类型的报告生成' % test_type)
+    return test_type
+
+
+def clean_report_data(report_data_dir):
+    if report_data_dir.exists():
+        shutil.rmtree(report_data_dir)
+    report_data_dir.mkdir(parents=True, exist_ok=True)
+    print('已清理Allure原始数据：%s' % report_data_dir, flush=True)
 
 
 def release_allure_port(port):
@@ -136,10 +161,10 @@ def release_allure_port(port):
 
 def run():
     args = parse_args()
-    if not args.keep_report_data:
-        clean_report_data()
 
     try:
+        demo_path = resolve_demo_path(args.demo)
+        test_type = resolve_test_type(demo_path)
         test_args = build_test_args(args.demo, args.tests)
     except ValueError as error:
         print('参数错误：%s' % error)
@@ -147,6 +172,12 @@ def run():
     if not test_args:
         print('未找到可执行的测试文件。')
         return 2
+
+    report_spec = REPORT_SPECS[test_type]
+    report_data_dir = report_spec['data_dir']
+    report_port = args.port or report_spec['default_port']
+    if not args.keep_report_data:
+        clean_report_data(report_data_dir)
 
     pytest_command = [
         sys.executable,
@@ -156,22 +187,22 @@ def run():
         'config/pytest.ini',
         '-v',
         '-s',
-        '--alluredir=%s' % REPORT_DATA_DIR,
+        '--alluredir=%s' % report_data_dir,
     ] + test_args
-    print('执行命令：%s' % ' '.join(pytest_command))
+    print('执行命令：%s' % ' '.join(pytest_command), flush=True)
     test_result = subprocess.run(pytest_command, cwd=PROJECT_ROOT).returncode
 
     report_result = 0
     if not args.no_report:
-        release_allure_port(args.port)
+        release_allure_port(report_port)
         report_command = [
             sys.executable,
             '-m',
-            'scripts.reports.generate_web_ui_test_report',
-            '--chrome_port',
-            str(args.port),
+            report_spec['module'],
+            report_spec['port_arg'],
+            str(report_port),
         ]
-        print('生成报告命令：%s' % ' '.join(report_command))
+        print('生成报告命令：%s' % ' '.join(report_command), flush=True)
         report_result = subprocess.run(report_command, cwd=PROJECT_ROOT).returncode
 
     return test_result if test_result != 0 else report_result

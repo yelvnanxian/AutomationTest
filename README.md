@@ -101,6 +101,19 @@ macOS 开发环境中建议通过以下脚本执行命令：
 
 脚本会切换到项目根目录，并加载项目的 Python、Java、Node.js 和 Appium 路径。
 
+## 常用命令速查
+
+| 目标 | 命令 |
+| --- | --- |
+| SauceDemo全部用例 | `./scripts/runners/run_test_suite.sh --demo saucedemo` |
+| SauceDemo正常回归 | `./scripts/runners/run_test_suite.sh --demo saucedemo --tests cart,checkout,inventory,login,navigation` |
+| httpbin API测试 | `./scripts/runners/run_test_suite.sh --demo httpbin` |
+| 框架单元测试 | `./scripts/test_env.sh python -m pytest -c config/pytest.ini -m unit cases/unit` |
+| 只收集不执行 | `./scripts/test_env.sh python -m pytest -c config/pytest.ini --collect-only cases` |
+| 静态检查 | `./scripts/test_env.sh python tools/static_check.py` |
+
+默认统一入口会清理对应类型的旧Allure原始数据，然后执行测试并启动报告服务。只想验证代码、不启动报告时增加 `--no-report`。
+
 ## Web UI 测试
 
 ### 启动 Selenium
@@ -156,6 +169,46 @@ SELENIUM_PORT=5555 ./scripts/services/start_selenium.sh
   -k search
 ```
 
+执行 httpbin API 示例的全部8条用例：
+
+```bash
+./scripts/test_env.sh python -m pytest \
+  -c config/pytest.ini \
+  -v -s \
+  --alluredir=output/api/report_data \
+  cases/api/httpbin
+```
+
+只执行认证相关用例：
+
+```bash
+./scripts/test_env.sh python -m pytest \
+  -c config/pytest.ini \
+  -v \
+  -k basic_auth \
+  cases/api/httpbin
+```
+
+httpbin 默认地址配置在 `config/httpbin/api_httpbin_test.conf`。临时切换兼容服务时可以使用环境变量，无需修改配置文件：
+
+```bash
+HTTPBIN_BASE_URL=https://httpbin.org \
+  ./scripts/test_env.sh python -m pytest \
+  -c config/pytest.ini \
+  -v \
+  cases/api/httpbin
+```
+
+如果公开的 `httpbin.org` 临时返回502、503或504，用例会标记为跳过并明确显示环境不可用。也可以临时使用兼容服务验证框架能力：
+
+```bash
+HTTPBIN_BASE_URL=https://httpbingo.org \
+  ./scripts/test_env.sh python -m pytest \
+  -c config/pytest.ini \
+  -v \
+  cases/api/httpbin
+```
+
 ### App UI 测试
 
 ```bash
@@ -203,12 +256,27 @@ SELENIUM_PORT=5555 ./scripts/services/start_selenium.sh
 
 ```bash
 ./scripts/runners/run_test_suite.sh --demo saucedemo
+./scripts/runners/run_test_suite.sh --demo httpbin
 ./scripts/runners/run_test_suite.sh --demo demoproject
 ./scripts/runners/run_test_suite.sh --demo web_ui
 ./scripts/runners/run_test_suite.sh --demo web_ui/demoProject
+./scripts/runners/run_test_suite.sh --demo api/httpbin
 ```
 
-`--demo` 可以传别名，也可以传 `cases` 下的相对目录。新增demo时，只需创建 `cases/web_ui/<new_demo>/`，再使用 `--demo web_ui/<new_demo>`，不需要修改运行框架。
+`--demo` 可以传别名，也可以传 `cases` 下的相对目录。新增demo时，只需创建 `cases/web_ui/<new_demo>/` 或 `cases/api/<new_demo>/`，再传对应相对目录，不需要修改运行框架。
+
+Web UI报告默认使用9527端口，API报告默认使用9080端口。执行httpbin并生成API报告：
+
+```bash
+./scripts/runners/run_test_suite.sh --demo httpbin
+```
+
+公开服务不可用时临时切换兼容地址：
+
+```bash
+HTTPBIN_BASE_URL=https://httpbingo.org \
+  ./scripts/runners/run_test_suite.sh --demo httpbin
+```
 
 `--demo saucedemo`、`--demo web_ui/demoProject` 和 `--demo web_ui` 都会按照pytest默认规则收集 `test_*.py`，不会单独排除故意失败用例。
 
@@ -311,11 +379,162 @@ cases/api/<demo>/scenarios/test_<demo>_<scenario>.py
 新增接口模块后，pytest会自动收集 `test_*.py`，不需要修改公共客户端或测试运行器。例如：
 
 ```bash
-./scripts/test_env.sh python -m scripts.runners.run_api_test \
-  -e test \
-  -d cases/api/<demo> \
-  -k <module>
+./scripts/runners/run_test_suite.sh \
+  --demo api/<demo> \
+  --tests <module>
 ```
+
+## 实际项目接入前必读
+
+当前仓库包含公开网站和历史模块示例，可以作为新项目骨架，但不能直接把演示配置、演示账号和跳过策略原样用于生产项目。接入真实业务前应完成环境隔离、测试数据清理、密钥管理和发布门禁配置。
+
+### 已知风险与规避方式
+
+建议处理顺序：先解决生产安全、密钥和测试数据清理问题；再解决配置缓存、共享Session和并发隔离；最后处理报告、日志、IDE配置和版本升级等工程体验问题。
+
+| 风险 | 当前表现和可能影响 | 实际项目规避方式 |
+| --- | --- | --- |
+| 配置对象使用单例缓存 | 同一Python进程切换环境后，可能继续使用第一次加载的URL或浏览器配置 | 一个测试进程只运行一个环境；切换环境后重新启动pytest进程；新项目优先使用fixture注入配置，不继续增加全局单例 |
+| API客户端共享Session | session级fixture会共享Cookie和请求头，一个用例可能污染后续用例 | 无状态接口可使用session级客户端；登录态、权限和租户场景使用function级客户端，或在用例结束后明确重置Header和Cookie |
+| 并发测试数据冲突 | 多个worker使用相同账号、订单号或数据库记录时可能互相覆盖 | 测试数据增加运行批次ID和worker ID；每个用例创建独立数据；结束后通过fixture、事务回滚或清理接口释放数据 |
+| 公共测试环境不稳定 | 网络抖动、限流或服务503会导致与代码无关的失败 | 对公共演示服务可以跳过并说明原因；对公司测试、预发布环境不可直接跳过，应将环境不可用单独上报并阻止发布 |
+| 重试掩盖真实缺陷 | 不恰当重试可能让偶发失败看起来通过，POST重试还可能重复创建数据 | 仅对连接失败和明确幂等的GET请求重试；POST、支付、下单等操作除非带幂等键，否则禁止自动重试；报告中保留首次失败记录 |
+| UI并发和共享配置 | 旧Web运行器会动态修改 `current_browser`，多个作业同时运行可能互相覆盖 | 同一工作目录不要同时启动多个修改配置的Web任务；CI使用独立工作目录；后续逐步改为环境变量或fixture传递浏览器类型 |
+| UI定位和等待不稳定 | 使用易变化的CSS层级、固定睡眠或动画元素会产生偶发失败 | 优先使用 `data-test`、稳定ID和显式等待；不要使用固定 `sleep`；页面跳转、弹窗和异步加载必须封装等待条件 |
+| 敏感信息泄漏 | 真实账号、密码、Token或云密钥可能进入代码、日志和Allure附件 | 仓库只保存字段结构和公开演示值；真实密钥通过环境变量或CI Secret提供；提交前检查暂存差异；不要把生产响应原文长期保存 |
+| 测试报告混入旧数据 | 使用 `--keep-report-data` 会把多次执行结果合并，出现重复或过期用例 | 日常回归保持默认清理；只有明确需要聚合多进程结果时使用该参数；不同测试类型使用独立报告目录 |
+| Allure端口和残留进程 | 上一次报告服务未停止时可能出现端口占用 | 优先使用统一入口自动处理本项目启动的Allure进程；其他程序占用端口时使用 `--port` 指定新端口，不要随意终止未知进程 |
+| 生成文件进入Git | `.gitignore` 只能忽略未跟踪文件，历史上已跟踪的日志仍会持续显示修改 | 提交前确认 `git status`；不要暂存 `logs/`、`output/`、缓存和下载文件；已跟踪日志应由仓库维护者确认后从Git索引移除 |
+| VS Code配置未共享 | `.vscode` 当前被忽略，新成员拉取后不会自动得到本地测试配置 | README作为统一配置来源；每位开发者本地创建 `.vscode/settings.json`；如果团队决定共享，再调整 `.gitignore` 并只提交无个人路径的配置 |
+| 版本升级造成不兼容 | Selenium、浏览器、Allure、Appium或pytest大版本升级可能改变行为 | 使用已验证版本；依赖升级单独提交；先运行单元测试、API冒烟和Web冒烟，再更新团队基线版本 |
+| 在生产环境执行破坏性测试 | 创建、删除、压力和故障演练可能影响真实用户与数据 | 默认只允许test或staging；production必须使用只读账号和独立marker；压力、删除、支付、消息发送等操作需要单独授权和保护开关 |
+
+### 推荐的真实项目目录
+
+以下示例使用 `my_project`，项目名应使用 `snake_case`：
+
+```text
+config/my_project/
+├── api_test.conf
+├── api_staging.conf
+└── web_ui.conf
+
+api_objects/my_project/
+├── endpoints/
+└── services/
+
+page_objects/web_ui/my_project/
+├── components/
+├── elements/
+└── pages/
+
+test_data/
+├── api/my_project/
+└── web_ui/my_project/
+
+cases/
+├── api/my_project/
+│   ├── api/
+│   └── scenarios/
+└── web_ui/my_project/
+```
+
+不要复制 `demoProject` 的单例客户端作为新项目起点。API项目优先使用通用 `base/api/api_client.py`，页面和接口业务能力分别放入 `page_objects` 与 `api_objects`。
+
+### 推荐接入步骤
+
+1. 明确测试环境、基础URL、认证方式、数据库和依赖服务，不使用生产环境作为默认值。
+2. 为新项目创建独立配置目录，真实密码和Token只定义环境变量名称，不写具体值。
+3. 先实现一个健康检查和一个核心业务冒烟用例，确认网络、权限、报告和清理链路可用。
+4. 按端点、Service、测试数据、fixture、用例的顺序扩展，不在测试方法中直接拼接URL或创建底层客户端。
+5. 为创建、更新、删除场景设计数据回收方案，并验证用例失败时也能执行清理。
+6. 补充正常、异常、边界、权限和重复提交场景，重要API增加状态码、JSON Schema与响应时间断言。
+7. UI用例优先覆盖真实用户核心流程，公共导航栏、弹窗、表格等放入 `components`，不要在多个页面重复定位。
+8. 本地验证通过后再接入CI，先运行框架单元测试和冒烟测试，再逐步增加完整回归与性能任务。
+
+### 环境与密钥管理
+
+建议一个命令只运行一个环境，并使用环境变量覆盖敏感配置：
+
+```bash
+MY_PROJECT_BASE_URL=https://api-test.example.com \
+MY_PROJECT_USERNAME=test_user \
+MY_PROJECT_PASSWORD='从本地密钥或CI Secret读取' \
+  ./scripts/runners/run_test_suite.sh \
+  --demo api/my_project \
+  --no-report
+```
+
+测试代码应在缺少必要密钥时快速失败并显示缺少的变量名，但不能输出变量值。禁止在以下位置保存真实密钥：
+
+- `test_data/`
+- `config/*.conf`
+- README命令示例
+- Allure附件
+- `logs/`
+- Git提交信息
+
+### 测试数据生命周期
+
+真实项目应保证每条用例都具备完整生命周期：
+
+```text
+准备独立数据
+→ 执行业务操作
+→ 验证接口、页面或数据库结果
+→ 无论成功失败都清理数据
+```
+
+推荐使用：
+
+- UUID、时间戳或构建号生成唯一用户名、订单号和资源名。
+- pytest fixture的 `yield` 在测试结束后执行清理。
+- 数据库测试优先使用事务并在结束后回滚。
+- 无法立即删除的数据增加固定前缀，定时任务只清理测试前缀数据。
+- 不让用例依赖其他用例先执行，也不依赖固定执行顺序。
+
+### 并发执行注意事项
+
+- `pytest-xdist` 使用独立进程，每个worker仍应创建自己的客户端和测试数据。
+- `requests.Session` 包含可变Cookie和Header，不要在线程之间共享同一个实例。
+- Web UI每个worker必须使用独立浏览器会话、下载目录和账号。
+- 同一账号不应同时执行修改个人资料、购物车、订单等有状态场景。
+- 首次接入先以单worker验证稳定性，再逐步提高并发数。
+
+### 推荐CI分层
+
+当前仓库没有默认启用GitHub Actions工作流，接入CI时建议分层执行：
+
+| 阶段 | 建议内容 | 失败处理 |
+| --- | --- | --- |
+| 每次提交 | 静态检查、框架单元测试、API冒烟 | 阻止合并 |
+| 合并主分支 | 核心API和Web UI回归 | 阻止发布 |
+| 每晚定时 | 全量浏览器、跨接口场景、数据一致性 | 创建缺陷并通知负责人 |
+| 发布前 | staging端到端、权限、兼容性 | 不通过则禁止发布 |
+| 独立性能任务 | Locust或JMeter压测 | 不与功能测试共用环境和数据 |
+
+建议门禁命令：
+
+```bash
+./scripts/test_env.sh python tools/static_check.py
+./scripts/test_env.sh python -m pytest -c config/pytest.ini -m unit cases/unit
+./scripts/test_env.sh python -m pytest -c config/pytest.ini cases/api/my_project
+```
+
+故意失败的 `failure_demo` 用例只用于报告展示，不能加入发布门禁的通过率统计。
+
+### 发布前检查清单
+
+- [ ] 默认环境不是生产环境。
+- [ ] 账号、密码、Token和云密钥未进入Git差异。
+- [ ] 测试数据具备唯一标识和失败清理方案。
+- [ ] 正常、异常、边界和权限场景已覆盖。
+- [ ] 外部依赖不可用不会被误判为业务断言失败。
+- [ ] 生产或预发布环境不可用不会被静默跳过。
+- [ ] 并发用例没有共享账号、Cookie、Header和下载目录。
+- [ ] Allure报告没有混入旧结果和敏感数据。
+- [ ] `logs/`、`output/`、缓存和本地配置没有被暂存。
+- [ ] 静态检查、单元测试和核心冒烟测试通过。
 
 ### 进一步优化方向
 
@@ -326,6 +545,35 @@ cases/api/<demo>/scenarios/test_<demo>_<scenario>.py
 - 在失败钩子中自动保存截图、页面源码、请求与响应，并作为Allure附件输出。
 - 将环境配置对象从全局单例逐步改为fixture注入，便于并行执行多个环境且避免配置缓存串用。
 - 为页面对象、服务对象和测试数据增加类型标注，并在提交前增加lint和类型检查。
+
+### 已启用的测试质量能力
+
+- `HttpResponseResult.json()`：统一解析JSON响应。
+- `assert_status_code()`：输出预期状态码、实际状态码和请求URL。
+- `assert_response_time()`：为重要接口设置响应时间上限。
+- `assert_json_schema()`：使用JSON Schema校验响应字段和类型。
+- API请求结束后记录状态码、请求地址和响应耗时。
+- 测试失败时自动将HTTP请求与响应附加到Allure报告。
+- Authorization、Cookie、密码、Token等敏感信息会自动脱敏。
+- `api`、`unit`、`failure_demo` marker用于分类选择测试。
+
+只执行框架公共能力单元测试：
+
+```bash
+./scripts/test_env.sh python -m pytest \
+  -c config/pytest.ini \
+  -v \
+  -m unit \
+  cases/unit
+```
+
+只执行故意失败的报告演示用例：
+
+```bash
+./scripts/runners/run_test_suite.sh \
+  --demo saucedemo \
+  --tests failure
+```
 
 ## 配置说明
 

@@ -1,6 +1,7 @@
-#-*- coding:utf8 -*-
+# -*- coding:utf8 -*-
 """作用：提供request client相关的通用工具能力。"""
 
+from common.http_client.diagnostics import record_http_exchange
 from pojo.http_response_result import HttpResponseResult
 from requests.adapters import HTTPAdapter
 import requests
@@ -88,14 +89,14 @@ class DoRequest(object):
         with self._session.get(self._url + path, params=params, headers=self._headers, cookies=self._cookies,
                                timeout=self._timeout, proxies=self._proxies, verify=self._verify, **kwargs) as r:
             httpResponseResult = HttpResponseResult()
-            httpResponseResult.status_code=r.status_code
-            httpResponseResult.headers=r.headers.__str__()
+            self._populate_response_result(httpResponseResult, r)
             self.updateCookies(self._session.cookies.get_dict())
             httpResponseResult.cookies=ujson.dumps(self.getCookies())
             with open(storeFilePath,"wb") as f:
                 for chunk in r.iter_content(chunk_size=64 * 1024):
                     if chunk:
                         f.write(chunk)
+        record_http_exchange(httpResponseResult)
         return httpResponseResult
 
     def _dealResponseResult(self,r):
@@ -104,14 +105,26 @@ class DoRequest(object):
         :param r: requests请求响应
         :return:
         """
-        r.encoding=self._encoding
-        httpResponseResult=HttpResponseResult()
-        httpResponseResult.status_code=r.status_code
-        httpResponseResult.headers=r.headers.__str__()
+        r.encoding = self._encoding
+        httpResponseResult = HttpResponseResult()
+        self._populate_response_result(httpResponseResult, r)
         self.updateCookies(self._session.cookies.get_dict())
-        httpResponseResult.cookies=ujson.dumps(self.getCookies())
-        httpResponseResult.body=r.content.decode(self._encoding)
+        httpResponseResult.cookies = ujson.dumps(self.getCookies())
+        httpResponseResult.body = r.content.decode(self._encoding)
+        record_http_exchange(httpResponseResult)
         return httpResponseResult
+
+    @staticmethod
+    def _populate_response_result(http_response_result, response):
+        """补充响应状态、耗时以及用于失败诊断的请求摘要。"""
+        http_response_result.status_code = response.status_code
+        http_response_result.headers = response.headers.__str__()
+        http_response_result.headers_dict = dict(response.headers)
+        http_response_result.elapsed_ms = round(response.elapsed.total_seconds() * 1000, 2)
+        http_response_result.url = response.url
+        http_response_result.request_method = response.request.method
+        http_response_result.request_headers = dict(response.request.headers)
+        http_response_result.request_body = response.request.body
 
     def changeUrl(self,url):
         self._url=url

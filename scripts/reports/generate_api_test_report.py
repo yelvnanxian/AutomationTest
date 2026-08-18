@@ -15,7 +15,8 @@ def main():
     parser.add_argument('-p', '--port', help='生成报告使用的端口', type=int)
     args = parser.parse_args()
 
-    configured_port = Read_Report_Config().report_config.api_port
+    report_config = Read_Report_Config().report_config
+    configured_port = report_config.api_port
     port = validate_port(args.port if args.port is not None else configured_port)
     test_time = DateTimeTool.getNowTime('%Y_%m_%d_%H_%M_%S_%f')
     report_output_dir = 'output/api/report/api_report_%s' % test_time

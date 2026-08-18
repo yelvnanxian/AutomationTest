@@ -7,5 +7,6 @@ pytest-rerunfailures==16.5
 allure-pytest==2.16.0
 PyHamcrest==2.1.0
 requests==2.34.2
+jsonschema==4.26.0
 Pillow==12.3.0
 ujson==5.11.0
